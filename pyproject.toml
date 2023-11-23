@@ -6,8 +6,5 @@ select = ["F"]
 
 [tool.isort]
 py_version=39
-skip=["backendev/*", ".gitignore", ".ruff", ".idea", "db.sqlite3"]
-
-[settings]
 profile = "django"
-src_path = ["isort"]
+skip=["backendev/*", ".gitignore", ".ruff_cache", ".idea", "db.sqlite3"]

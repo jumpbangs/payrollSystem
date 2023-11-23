@@ -1,0 +1,16 @@
+asgiref==3.7.2
+cfgv==3.4.0
+distlib==0.3.7
+Django==4.2.7
+djangorestframework==3.14.0
+filelock==3.13.1
+identify==2.5.32
+isort==5.12.0
+nodeenv==1.8.0
+platformdirs==4.0.0
+pre-commit==3.5.0
+pytz==2023.3.post1
+PyYAML==6.0.1
+ruff==0.1.6
+sqlparse==0.4.4
+virtualenv==20.24.7
