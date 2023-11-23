@@ -8,8 +8,8 @@ class Country(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     country_name = models.CharField(max_length=225, null=True, default=None)
     country_code = models.CharField(max_length=3, null=True, default=None)
-    country_number_code = models.CharField(max_length=4, null=True, default=None)
-    postal_code = models.IntegerField(null=True, default=None)
+    phone_code = models.CharField(max_length=4, null=True, default=None)
+    currency = models.CharField(max_length=4, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -23,6 +23,7 @@ class City(models.Model):
     state = models.CharField(max_length=100, null=True, default=None)
     state_code = models.CharField(max_length=4, null=True, default=None)
     has_branch = models.BooleanField(null=True, default=False)
+    postal_code = models.CharField(max_length=10, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
