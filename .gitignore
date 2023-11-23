@@ -1,6 +1,6 @@
 backendenv
 
 .idea
-.ruff
+.ruff_cache
 
 db.sqlite3
