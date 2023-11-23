@@ -16,6 +16,7 @@ class Country(models.Model):
     def __str__(self) -> str:
         return self.country_name
 
+
 class City(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     city_name = models.CharField(max_length=225, null=True, default=None)
@@ -27,12 +28,15 @@ class City(models.Model):
 
     def __str__(self) -> str:
         return self.city_name
-    
+
+
 class Address(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     address = models.CharField(max_length=225, null=True, default=None)
-    city_id = models.ForeignKey(City, on_delete=models.CASCADE, null=True, default=None, related_name='address_city_id')
-    country_id = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, default=None, related_name='address_country_id')
+    city_id = models.ForeignKey(City, on_delete=models.CASCADE, null=True, default=None, related_name="address_city_id")
+    country_id = models.ForeignKey(
+        Country, on_delete=models.CASCADE, null=True, default=None, related_name="address_country_id"
+    )
     lat = models.FloatField(null=True, default=None)
     lng = models.FloatField(null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)

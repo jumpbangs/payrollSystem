@@ -20,7 +20,8 @@ class Worklogs(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
+
+
 class Clients(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     client_name = models.CharField(max_length=225, null=True, default=None)

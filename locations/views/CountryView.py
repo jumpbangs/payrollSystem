@@ -8,12 +8,11 @@ from locations.serializers import CountrySerializer
 
 # Create your views here.
 class CountryModelView(APIView):
-    
-    pagination_class = CustomPagination\
-    
+    pagination_class = CustomPagination
     """
     GET: Fetch all countries
     """
+
     def get(self, request):
         try:
             country = Country.objects.all()
