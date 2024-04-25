@@ -22,11 +22,10 @@ class CityModelView(APIView):
     """
 
     def get(self, request):
-        city_data = request.data
-        city_id = city_data.get("city_id")
+        city_id = request.GET.get("city_id", None)
 
         try:
-            if city_id:
+            if city_id is not None:
                 city = City.objects.get(pk=city_id)
                 serialized_data = CitySerializer(city)
                 return get_success_response_200(serialized_data.data)
