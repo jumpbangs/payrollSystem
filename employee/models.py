@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 
 from locations.models import Address
@@ -20,42 +21,21 @@ class EmploymentType(models.TextChoices):
     CASUAL = 5, "Casual"
 
 
-class JobTitle(models.TextChoices):
-    ENGINEER = 1, "Engineer"
-    MANAGER = 2, "Manager"
-    ACCOUNTANT = 3, "Accountant"
-    HR = 4, "HR"
-    SALES = 5, "Sales"
-    IT = 6, "IT"
+class UserRole(models.TextChoices):
+    EMPLOYEE = "E", "Employee"
+    MANAGER = "M", "Manager"
+    ADMIN = "A", "Admin"
 
 
-class EmploymentStatus(models.Model):
-    id = models.IntegerField(primary_key=True, default=0)
-    employment_term = models.CharField(max_length=1, null=False, default=3)
-    position = models.CharField(max_length=1, null=False, default=JobTitle.ENGINEER, choices=JobTitle.choices)
-    status = models.CharField(max_length=1, null=False, default=WorkerStatus.ACTIVE, choices=WorkerStatus.choices)
-    employment_type = models.CharField(
-        max_length=1, null=False, default=EmploymentType.PART_TIME, choices=EmploymentType.choices
-    )
-
-    def __str__(self) -> str:
-        return "{value} : {display}".format(
-            value=self.get_position_display(),
-            display=self.get_employment_type_display() + " - " + self.get_status_display(),
-        )
-
-    def save(self, *args, **kwargs):
-        self.id = self.id + 1
-        super().save(*args, **kwargs)
-
-
-class Employee(models.Model):
+class Employee(AbstractBaseUser, PermissionsMixin):
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=100, null=True, default=None)
     last_name = models.CharField(max_length=100, null=True, default=None)
     date_of_birth = models.DateField(null=True, default=None)
     gender = models.CharField(max_length=10, null=True, default=None)
-    employee_status = models.ForeignKey(EmploymentStatus, on_delete=models.CASCADE, null=True, default=None)
+    employment_type = models.CharField(
+        max_length=1, null=False, default=EmploymentType.PART_TIME, choices=EmploymentType.choices
+    )
     employee_address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, default=None)
     email = models.EmailField(max_length=225, unique=True, default=None)
     employment_start = models.DateTimeField(auto_now_add=True)
@@ -63,6 +43,14 @@ class Employee(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     password = models.CharField(max_length=100, null=True, default=None)
+
+    user_role = models.CharField(max_length=1, null=False, choices=UserRole.choices, default=UserRole.EMPLOYEE)
+    is_staff = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=True)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"
