@@ -14,16 +14,6 @@ from locations.serializers import CitySerializer
 
 
 # Create your views here.
-@api_view(["GET"])
-def get_all_cities(request):
-    try:
-        city = City.objects.all()
-        serialized_data = CitySerializer(city, many=True)
-        return get_success_response_200(serialized_data.data)
-    except Exception as exception:
-        return get_server_response_500(str(exception))
-
-
 class CityModelView(APIView):
     pagination_class = CustomPagination
 
@@ -35,11 +25,15 @@ class CityModelView(APIView):
         city_data = request.data
         city_id = city_data.get("city_id")
 
-        if is_none_or_empty(city_id):
-            return get_error_response_400("City id cannot be empty")
-
         try:
-            return get_success_response_200("Fetch City response")
+            if city_id:
+                city = City.objects.get(pk=city_id)
+                serialized_data = CitySerializer(city)
+                return get_success_response_200(serialized_data.data)
+            else:
+                city = City.objects.all()
+                serialized_data = CitySerializer(city, many=True)
+                return get_success_response_200(serialized_data.data)
         except Exception as exception:
             return get_server_response_500(str(exception))
 

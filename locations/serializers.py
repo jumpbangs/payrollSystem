@@ -6,16 +6,36 @@ from .models import Address, City, Country
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = "__all__"
+        fields = [
+            "id",
+            "address",
+            "city_id",
+            "country_id",
+            "lat",
+            "lng",
+        ]
 
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
-        fields = "__all__"
+        fields = [
+            "id",
+            "country_name",
+            "country_code",
+            "phone_code",
+            "currency",
+        ]
 
 
 class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
-        fields = "__all__"
+        fields = [
+            "id",
+            "city_name",
+            "state",
+            "state_code",
+            "has_branch",
+            "postal_code",
+        ]

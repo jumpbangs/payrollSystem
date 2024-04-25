@@ -28,6 +28,10 @@ class CountryModelView(APIView):
         except Exception as exception:
             return get_server_response_500(str(exception))
 
+    """
+    POST: Add new country
+    """
+
     def post(self, request):
         country_data = request.data
         country_name = country_data.get("country_name")
@@ -51,5 +55,32 @@ class CountryModelView(APIView):
                 return get_success_response_200(serialized_data.data)
             else:
                 return get_error_response_400("Country data is invalid")
+        except Exception as exception:
+            return get_server_response_500(str(exception))
+
+    """
+    PUT: Update country
+    """
+
+    def put(self, request):
+        country_data = request.data
+        country_id = country_data.get("country_id")
+
+        if is_none_or_empty(country_data):
+            return get_error_response_400("Country data cannot be empty")
+
+        if is_none_or_empty(country_id):
+            return get_error_response_400("Country id cannot be empty")
+
+        try:
+            country_data_to_update = Country.objects.get(pk=country_id)
+            serialized_data = CountrySerializer(country_data_to_update, data=country_data, partial=True)
+            if serialized_data.is_valid():
+                serialized_data.save()
+                return get_success_response_200(serialized_data.data)
+            else:
+                return get_error_response_400("Country data is invalid")
+        except Country.DoesNotExist:
+            return get_error_response_404("Country not found or doesn't exist")
         except Exception as exception:
             return get_server_response_500(str(exception))

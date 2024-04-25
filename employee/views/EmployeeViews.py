@@ -58,9 +58,9 @@ class EmployeeModelView(APIView):
             return get_error_response_400("Employee password cannot be empty")
 
         try:
-            serialised_data = EmployeeSerializer(data=employee_data)
-            if serialised_data.is_valid():
-                serialised_data.save()
+            serialized_data = EmployeeSerializer(data=employee_data)
+            if serialized_data.is_valid():
+                serialized_data.save()
                 return get_success_response_200("Employee added successfully")
             else:
                 return get_error_response_400("Employee data is invalid")
