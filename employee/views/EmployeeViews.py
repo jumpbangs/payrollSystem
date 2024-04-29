@@ -18,20 +18,20 @@ class EmployeeModelView(APIView):
     """
 
     def get(self, request):
-        employee_data = request.GET.get("user_id")
-        if is_none_or_empty(employee_data):
+        employee_id = request.GET.get("user_id")
+        if is_none_or_empty(employee_id):
             try:
                 employee_data = Employee.objects.all()
-                serialised_data = EmployeeSerializer(employee_data, many=True)
-                return get_success_response_200(serialised_data.data)
+                serialized_data = EmployeeSerializer(employee_data, many=True)
+                return get_success_response_200(serialized_data.data)
 
             except Exception as exception:
                 return get_server_response_500(str(exception))
         else:
             try:
-                employee_data = Employee.objects.get(pk=employee_data)
-                serialised_data = EmployeeSerializer(employee_data)
-                return get_success_response_200(serialised_data.data)
+                employee_data = Employee.objects.get(pk=employee_id)
+                serialized_data = EmployeeSerializer(employee_data)
+                return get_success_response_200(serialized_data.data)
 
             except Employee.DoesNotExist:
                 return get_error_response_404("Employee not found")

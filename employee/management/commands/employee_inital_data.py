@@ -28,6 +28,7 @@ class Command(BaseCommand):
             is_superuser=True,
         )
         admin.set_password("itseasy")
+        admin.save()
 
         # Create initial Employee instances
         emp = Employee.objects.create(
@@ -45,5 +46,6 @@ class Command(BaseCommand):
             is_superuser=False,
         )
         emp.set_password(str(get_current_year()) + emp.last_name)
+        emp.save()
 
         self.stdout.write(self.style.SUCCESS("Initial data populated successfully"))

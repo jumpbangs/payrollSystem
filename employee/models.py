@@ -53,7 +53,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     def __str__(self) -> str:
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name} ===> {self.email} ==> {self.password}"
 
     def set_password(self, password):
         self.password = make_password(password)
