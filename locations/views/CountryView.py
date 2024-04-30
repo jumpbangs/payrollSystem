@@ -1,3 +1,5 @@
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from backend.networkHelpers import (
@@ -7,13 +9,15 @@ from backend.networkHelpers import (
     get_success_response_200,
 )
 from backend.paginationHelpers import CustomPagination
-from backend.utils.helpers import is_none_or_empty
+from backend.utils.helpers import is_none_or_empty, is_user_manager_or_admin
 from locations.models import Country
 from locations.serializers import CountrySerializer
 
 
 # Create your views here.
 class CountryModelView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     pagination_class = CustomPagination
 
     """
@@ -35,6 +39,9 @@ class CountryModelView(APIView):
     def post(self, request):
         country_data = request.data
         country_name = country_data.get("country_name")
+
+        if not is_user_manager_or_admin(request.user.user_role):
+            return get_error_response_400("Only admin and manager can add new countries")
 
         if is_none_or_empty(country_data):
             return get_error_response_400("Country data cannot be empty")
@@ -65,6 +72,9 @@ class CountryModelView(APIView):
     def put(self, request):
         country_data = request.data
         country_id = country_data.get("country_id")
+
+        if not is_user_manager_or_admin(request.user.user_role):
+            return get_error_response_400("Only admin and manager can update countries")
 
         if is_none_or_empty(country_data):
             return get_error_response_400("Country data cannot be empty")
