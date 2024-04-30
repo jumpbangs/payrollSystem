@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -13,8 +14,8 @@ from backend.utils.helpers import (
     is_user_admin,
     is_user_manager_or_admin,
 )
-from employee.models import Employee
-from employee.serializers import EmployeeSerializer
+from employee.models import Employee, EmploymentTerms
+from employee.serializers import EmployeeSerializer, EmploymentTermsSerializer
 
 
 # Create your views here.
@@ -69,20 +70,17 @@ class EmployeeModelView(APIView):
             if Employee.objects.filter(email=employee_data.get("email")).exists():
                 return get_error_response_400("Employee with this email already exists")
 
-        if is_none_or_empty(employee_data.get("password")):
-            return get_error_response_400("Employee password cannot be empty")
+        with transaction.atomic():
+            try:
+                new_employee = Employee.objects.create(**employee_data)
+                new_employee.save()
+                return get_success_response_200("Employee added successfully")
 
-        try:
-            new_employee = Employee.objects.create(**employee_data)
-            new_employee.set_password(employee_data.get("password"))
-            new_employee.save()
-            return get_success_response_200("Employee added successfully")
-
-        except Exception as exception:
-            return get_server_response_500(str(exception))
+            except Exception as exception:
+                return get_server_response_500(str(exception))
 
     """
-    PUT: Update Employee
+    PATCH: Update Employee
     """
 
     def patch(self, request):
@@ -136,5 +134,57 @@ class EmployeeModelView(APIView):
             return get_success_response_200("Employee deleted successfully")
         except Employee.DoesNotExist:
             return get_error_response_404("Employee not found")
+        except Exception as exception:
+            return get_server_response_500(str(exception))
+
+
+class EmploymentTermsView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    """
+    GET: Fetch all employment terms
+    """
+
+    def get(self, request):
+        if not is_user_manager_or_admin(request.user.user_role):
+            return get_error_response_400("Only admin and manager can fetch all employment terms")
+
+        try:
+            employment_terms_data = EmploymentTerms.objects.all()
+            serialized_data = EmploymentTermsSerializer(employment_terms_data, many=True)
+            return get_success_response_200(serialized_data.data)
+
+        except Exception as exception:
+            return get_server_response_500(str(exception))
+
+    """
+    PUT: Update employment term
+    """
+
+    def patch(self, request):
+        employment_term_data = request.data
+        employee_id = employment_term_data.get("employee_id")
+
+        if not is_user_manager_or_admin(request.user.user_role):
+            return get_error_response_400("Only admin and manager can update employment terms")
+
+        if is_none_or_empty(employment_term_data):
+            return get_error_response_400("Employment term data cannot be empty")
+
+        if is_none_or_empty(employee_id):
+            return get_error_response_400("Employee id cannot be empty")
+
+        try:
+            employment_term_data_to_update = EmploymentTerms.objects.get(employee_id=employee_id)
+            serialized_data = EmploymentTermsSerializer(
+                employment_term_data_to_update, data=employment_term_data, partial=True
+            )
+            if serialized_data.is_valid():
+                serialized_data.save()
+                return get_success_response_200(serialized_data.data)
+            else:
+                return get_error_response_400("Employment term data is invalid")
+
         except Exception as exception:
             return get_server_response_500(str(exception))

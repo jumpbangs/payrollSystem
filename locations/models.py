@@ -5,7 +5,7 @@ from django.db import models
 
 # Create your models here.
 class Country(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     country_name = models.CharField(max_length=225, null=True, default=None)
     country_code = models.CharField(max_length=3, null=True, default=None)
     phone_code = models.CharField(max_length=4, null=True, default=None)
@@ -18,7 +18,7 @@ class Country(models.Model):
 
 
 class City(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     city_name = models.CharField(max_length=225, null=True, default=None)
     state = models.CharField(max_length=100, null=True, default=None)
     state_code = models.CharField(max_length=4, null=True, default=None)
@@ -32,7 +32,7 @@ class City(models.Model):
 
 
 class Address(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     address = models.CharField(max_length=225, null=True, default=None)
     city_id = models.ForeignKey(City, on_delete=models.CASCADE, null=True, default=None, related_name="address_city_id")
     country_id = models.ForeignKey(

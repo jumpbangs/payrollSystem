@@ -8,7 +8,7 @@ from locations.models import Address
 
 # Create your models here.
 class Worklogs(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, default=None)
     worklog_date = models.DateField(null=True, default=None)
     start_time = models.TimeField(null=True, default=None)
@@ -23,7 +23,7 @@ class Worklogs(models.Model):
 
 
 class Clients(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     client_name = models.CharField(max_length=225, null=True, default=None)
     client_email = models.EmailField(max_length=225, null=True, default=None)
     client_contact = models.IntegerField(null=True, default=None)
@@ -37,7 +37,7 @@ class Clients(models.Model):
 
 
 class WorklogDetails(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     worklog_id = models.ForeignKey(Worklogs, on_delete=models.CASCADE, null=True, default=None)
     client_id = models.ForeignKey(Clients, on_delete=models.CASCADE, null=True, default=None)
     job_type = models.CharField(max_length=225, null=True, default=None)

@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 
+from backend.utils.dateUtils import get_current_year
 from locations.models import Address
 
 
@@ -28,7 +29,7 @@ class UserRole(models.TextChoices):
 
 
 class Employee(AbstractBaseUser, PermissionsMixin):
-    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     first_name = models.CharField(max_length=100, null=True, default=None)
     last_name = models.CharField(max_length=100, null=True, default=None)
     date_of_birth = models.DateField(null=True, default=None)
@@ -55,6 +56,19 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            username = self.email.split("@")[0]
+            self.set_password(str(get_current_year) + str(username))
+
+            EmploymentTerms.objects.create(
+                employee_id=self,
+                leave_days=0,
+                sick_days=14,
+            )
+
+        super().save(*args, **kwargs)
+
     def __str__(self) -> str:
         return f"Employee name: {self.first_name} ==> user_id: {self.user_id} ===> email: {self.email}"
 
@@ -67,7 +81,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
 
 class EmploymentTerms(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, default=None)
     leave_days = models.IntegerField(null=True, default=0)
     sick_days = models.IntegerField(null=True, default=14)
@@ -78,11 +92,11 @@ class EmploymentTerms(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return self.employment_term
+        return f"{self.employee_id}"
 
 
 class Payments(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, default=None)
     gross_salary = models.FloatField(null=True, default=0)
     net_salary = models.FloatField(null=True, default=0)
@@ -92,4 +106,4 @@ class Payments(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return self.employment_term
+        return self.employee_id

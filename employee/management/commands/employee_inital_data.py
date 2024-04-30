@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
-from backend.utils.dateUtils import get_current_year
-from employee.models import Employee
+from backend.utils.dateUtils import get_current_date, get_current_year
+from employee.models import Employee, EmploymentTerms
 
 
 class Command(BaseCommand):
@@ -23,6 +23,7 @@ class Command(BaseCommand):
         )
         admin.set_password("itseasy")
         admin.save()
+        self.stdout.write(self.style.SUCCESS("Created admin successfully"))
 
         # Create initial Employee instances
         emp = Employee.objects.create(
@@ -41,5 +42,12 @@ class Command(BaseCommand):
         )
         emp.set_password(str(get_current_year()) + emp.last_name)
         emp.save()
+
+        EmploymentTerms.objects.create(
+            employee_id=emp,
+            leave_days=14,
+            sick_days=14,
+            start_date=get_current_date(),
+        )
 
         self.stdout.write(self.style.SUCCESS("Initial data populated successfully"))
