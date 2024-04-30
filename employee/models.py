@@ -34,7 +34,10 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     date_of_birth = models.DateField(null=True, default=None)
     gender = models.CharField(max_length=10, null=True, default=None)
     employment_type = models.CharField(
-        max_length=1, null=False, default=EmploymentType.PART_TIME, choices=EmploymentType.choices
+        max_length=1,
+        null=False,
+        default=EmploymentType.PART_TIME,
+        choices=EmploymentType.choices,
     )
     employee_address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, default=None)
     email = models.EmailField(max_length=225, unique=True, default=None)
@@ -53,7 +56,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     def __str__(self) -> str:
-        return f"{self.first_name} {self.last_name} ===> {self.email} ==> {self.password}"
+        return f"Employee name: {self.first_name} ==> user_id: {self.user_id} ===> email: {self.email}"
 
     def set_password(self, password):
         self.password = make_password(password)

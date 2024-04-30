@@ -1,19 +1,22 @@
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from backend.helpers import is_none_or_empty
 from backend.networkHelpers import (
     get_error_response_400,
-    get_error_response_404,
     get_server_response_500,
     get_success_response_200,
 )
 from backend.paginationHelpers import CustomPagination
+from backend.utils.helpers import is_none_or_empty, is_user_manager_or_admin
 from locations.models import Address
 from locations.serializers import AddressSerializer
 
 
 # Create your views here.
 class AddressModelView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     pagination_class = CustomPagination
 
     """
@@ -49,6 +52,9 @@ class AddressModelView(APIView):
     def post(self, request):
         address_data = request.data
         address = address_data.get("address")
+
+        if not is_user_manager_or_admin(request.user.user_role):
+            return get_error_response_400("Only admin and manager can add new addresses")
 
         if is_none_or_empty(address_data):
             return get_error_response_400("Address data cannot be empty")

@@ -1,6 +1,5 @@
 from rest_framework.views import APIView
 
-from backend.helpers import is_none_or_empty
 from backend.networkHelpers import (
     get_error_response_400,
     get_error_response_404,
@@ -8,6 +7,7 @@ from backend.networkHelpers import (
     get_success_response_200,
 )
 from backend.paginationHelpers import CustomPagination
+from backend.utils.helpers import is_none_or_empty
 from locations.models import Country
 from locations.serializers import CountrySerializer
 

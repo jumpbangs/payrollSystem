@@ -1,19 +1,13 @@
-from datetime import datetime
-
 from django.core.management.base import BaseCommand
 
+from backend.utils.dateUtils import get_current_year
 from employee.models import Employee
-
-
-def get_current_year():
-    return datetime.now().year
 
 
 class Command(BaseCommand):
     help = "Populate initial data into the database"
 
     def handle(self, *args, **options):
-
         if Employee.objects.exists():
             return self.stdout.write(self.style.SUCCESS("Initial data already exists"))
 

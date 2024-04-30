@@ -3,6 +3,11 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["F"]
+fixable = ["ALL"]
+
+[tool.ruff.format]
+skip-magic-trailing-comma = false
+line-ending = "auto"
 
 [tool.black]
 line-length = 120

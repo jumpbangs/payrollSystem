@@ -5,12 +5,12 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
-from backend.helpers import is_none_or_empty
 from backend.networkHelpers import (
     get_error_response_400,
     get_error_response_401,
     get_success_response_200,
 )
+from backend.utils.helpers import is_none_or_empty
 from employee.models import Employee
 from employee.serializers import EmployeeSerializer
 
@@ -57,3 +57,23 @@ class LogoutView(APIView):
             return get_success_response_200("Logout successful")
         else:
             return get_error_response_400("User is not authenticated")
+
+
+class ChangePasswordView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            old_password = request.data.get("old_password")
+            new_password = request.data.get("new_password")
+
+            if is_none_or_empty(old_password) or is_none_or_empty(new_password):
+                return get_error_response_400("Old password and new password cannot be empty")
+
+            if not check_password(old_password, request.user.password):
+                return get_error_response_401("The old password is incorrect")
+
+            request.user.set_password(new_password)
+            request.user.save()
+            return get_success_response_200("Password updated successfully")
