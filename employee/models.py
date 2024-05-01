@@ -1,7 +1,11 @@
 import uuid
 
 from django.contrib.auth.hashers import check_password, make_password
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.db import models
 
 from backend.utils.dateUtils import get_current_year
@@ -28,12 +32,35 @@ class UserRole(models.TextChoices):
     ADMIN = "A", "Admin"
 
 
+class EmployeeManager(BaseUserManager):
+    def _create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("Email must be be provided")
+        if not password:
+            raise ValueError("Password must be provided")
+
+        user = self.model(email=self.normalize_email(email), **extra_fields)
+        user.set_password(raw_password=password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email, password, **extra_fields):
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_active", True)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email, password, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_active", True)
+        return self._create_user(email, password, **extra_fields)
+
+
 class Employee(AbstractBaseUser, PermissionsMixin):
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     first_name = models.CharField(max_length=100, null=True, default=None)
     last_name = models.CharField(max_length=100, null=True, default=None)
     date_of_birth = models.DateField(null=True, default=None)
-    gender = models.CharField(max_length=10, null=True, default=None)
+
     employment_type = models.CharField(
         max_length=1,
         null=False,
@@ -51,23 +78,27 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     user_role = models.CharField(max_length=1, null=False, choices=UserRole.choices, default=UserRole.EMPLOYEE)
     is_staff = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
-    is_superuser = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
+
+    objects = EmployeeManager()
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     def save(self, *args, **kwargs):
         if self._state.adding:
-            username = self.email.split("@")[0]
-            self.set_password(str(get_current_year) + str(username))
+            if self.password is None:
+                username = self.email.split("@")[0]
+                self.set_password(str(get_current_year) + str(username))
 
+            super().save(*args, **kwargs)
             EmploymentTerms.objects.create(
                 employee_id=self,
                 leave_days=0,
                 sick_days=14,
             )
-
-        super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"Employee name: {self.first_name} ==> user_id: {self.user_id} ===> email: {self.email}"

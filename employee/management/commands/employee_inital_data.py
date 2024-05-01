@@ -1,7 +1,16 @@
+from datetime import datetime
+
 from django.core.management.base import BaseCommand
 
-from backend.utils.dateUtils import get_current_date, get_current_year
-from employee.models import Employee, EmploymentTerms
+from employee.models import Employee
+
+
+def get_current_year():
+    return datetime.now().year
+
+
+def get_current_date():
+    return datetime.now().strftime("%Y-%m-%d")
 
 
 class Command(BaseCommand):
@@ -30,10 +39,9 @@ class Command(BaseCommand):
             first_name="John",
             last_name="Doe",
             date_of_birth="1990-01-01",
-            gender="Male",
-            employment_type=1,  # Assuming this corresponds to the EmploymentStatus instance ID
+            employment_type=1,
             email="john@example.com",
-            employment_start="2022-01-01T00:00:00Z",
+            employment_start="2022-01-01",
             contact_number="1234567890",
             user_role="E",
             is_staff=True,
@@ -42,12 +50,5 @@ class Command(BaseCommand):
         )
         emp.set_password(str(get_current_year()) + emp.last_name)
         emp.save()
-
-        EmploymentTerms.objects.create(
-            employee_id=emp,
-            leave_days=14,
-            sick_days=14,
-            start_date=get_current_date(),
-        )
 
         self.stdout.write(self.style.SUCCESS("Initial data populated successfully"))

@@ -14,7 +14,7 @@ class Country(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return self.country_name
+        return f"{self.country_name}"
 
 
 class City(models.Model):
@@ -28,7 +28,7 @@ class City(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return self.city_name
+        return f"{self.city_name}"
 
 
 class Address(models.Model):
@@ -44,4 +44,4 @@ class Address(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return self.address
+        return f"{self.address}"
