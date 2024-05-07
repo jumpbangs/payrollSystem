@@ -12,12 +12,12 @@ class AddressSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "address",
-            "city",
-            "country",
             "city_id",
             "country_id",
             "lat",
             "lng",
+            "city",
+            "country",
         ]
 
     def get_city(self, obj):

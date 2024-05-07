@@ -69,14 +69,41 @@ class AddressModelView(APIView):
             return get_error_response_400("Country id cannot be empty")
 
         try:
-            print(address_data)
             serialized_data = AddressSerializer(data=address_data)
-            print(serialized_data.is_valid())
             if serialized_data.is_valid():
-                # print(serialized_data.data)
                 serialized_data.save()
                 return get_success_response_200(serialized_data.data)
             else:
                 return get_error_response_400("Address data is invalid")
+        except Exception as exception:
+            return get_server_response_500(str(exception))
+
+    """
+    PUT: Update Address data
+    """
+
+    def put(self, request):
+        address_data = request.data
+        address_id = address_data.get("address_id")
+        updated_address = address_data.get("address")
+
+        if not is_user_manager_or_admin(request.user.user_role):
+            return get_error_response_400("Only admin and manager can update addresses")
+
+        if is_none_or_empty(updated_address):
+            return get_error_response_400("Address cannot be empty")
+
+        if is_none_or_empty(address_id):
+            return get_error_response_400("Address id cannot be empty")
+
+        try:
+            address_data_to_update = Address.objects.get(pk=address_id)
+            serialized_data = AddressSerializer(address_data_to_update, data=address_data)
+            if serialized_data.is_valid():
+                serialized_data.save()
+                return get_success_response_200(serialized_data.data)
+            else:
+                return get_error_response_400("Address data is invalid")
+
         except Exception as exception:
             return get_server_response_500(str(exception))

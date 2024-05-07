@@ -2,7 +2,7 @@
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["F"]
+select = ["F", "T"]
 fixable = ["ALL"]
 
 [tool.ruff.format]

@@ -14,7 +14,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "date_of_birth",
-            "gender",
             "employment_type",
             "email",
             "employment_start",
