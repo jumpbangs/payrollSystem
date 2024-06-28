@@ -18,6 +18,10 @@ from employee.serializers import EmployeeSerializer
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
+    """
+    POST: Login API for Users
+    """
+
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
@@ -27,7 +31,6 @@ class LoginView(APIView):
 
         try:
             employee = Employee.objects.get(email=email)
-            print(f" LOL ===> {employee.password} ")
             if employee is None:
                 return get_error_response_401("The email is not registered")
 
@@ -50,6 +53,10 @@ class LogoutView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    """
+    DELETE: Logout API for Logging out users
+    """
+
     def delete(self, request):
         if request.user.is_authenticated:
             request.user.auth_token.delete()
@@ -62,6 +69,10 @@ class LogoutView(APIView):
 class ChangePasswordView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
+    """
+    POST: Change password for users API
+    """
 
     def post(self, request):
         if request.user.is_authenticated:

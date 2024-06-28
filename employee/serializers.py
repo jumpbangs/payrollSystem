@@ -61,7 +61,15 @@ class EmploymentTermsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EmploymentTerms
-        fields = ["employee_details", "leave_days", "sick_days", "agreed_salary", "start_date", "end_date"]
+        fields = [
+            "employee_details",
+            "leave_days",
+            "sick_days",
+            "agreed_salary",
+            "start_date",
+            "end_date",
+            "employee_id",
+        ]
 
     def get_employee_details(self, obj):
         try:
@@ -75,4 +83,4 @@ class EmploymentTermsSerializer(serializers.ModelSerializer):
 class PaymentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payments
-        fields = ["gross_salary", "tax", "net_salary", "last_payment"]
+        fields = ["gross_salary", "tax", "net_salary", "last_payment", "employee_id"]

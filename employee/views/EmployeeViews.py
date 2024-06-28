@@ -14,8 +14,12 @@ from backend.utils.helpers import (
     is_user_admin,
     is_user_manager_or_admin,
 )
-from employee.models import Employee, EmploymentTerms
-from employee.serializers import EmployeeSerializer, EmploymentTermsSerializer
+from employee.models import Employee, EmploymentTerms, Payments
+from employee.serializers import (
+    EmployeeSerializer,
+    EmploymentTermsSerializer,
+    PaymentsSerializer,
+)
 
 
 # Create your views here.
@@ -188,3 +192,92 @@ class EmploymentTermsView(APIView):
 
         except Exception as exception:
             return get_server_response_500(str(exception))
+
+
+class PaymentView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    """
+    GET: Fetch payment view for employee/employees
+    """
+
+    def get(self, request):
+        req_employee_id = request.data.get("employee_id")
+
+        def get_employee_payment(given_employee_id):
+            try:
+                employee_payment = Payments.objects.filter(employee_id_id=given_employee_id)
+                if not employee_payment.exists():
+                    return get_error_response_400("Employee payment doesn't exist for the given employee")
+                else:
+                    serialized_payment = PaymentsSerializer(employee_payment, many=True)
+                    return get_success_response_200(serialized_payment.data)
+
+            except Exception as exception:
+                return get_error_response_400(str(exception))
+
+        if is_user_admin(request.user.user_role):
+            if is_none_or_empty(req_employee_id):
+                return get_error_response_400("Employee id is empty.")
+            return get_employee_payment(req_employee_id)
+        else:
+            return get_employee_payment(request.user.user_id) or get_error_response_400(
+                "Only admins and users can fetch other/their user payment details"
+            )
+
+    """
+    POST: Add payment to user detail
+    """
+
+    def post(self, request):
+        payment_detail = request.data
+        required_fields = ["employee_id", "gross_salary", "net_salary", "tax"]
+
+        if not is_user_manager_or_admin(request.user.user_role):
+            return get_error_response_400("Only admin and managers can add user payment detail")
+
+        # Check for required fields
+        missing_fields = [field for field in required_fields if field not in payment_detail]
+        if missing_fields:
+            return get_error_response_400(f"Missing fields: {', '.join(missing_fields)}")
+
+        employee_id = payment_detail.get("employee_id")
+        try:
+            check_employee_data = Payments.objects.filter(employee_id=employee_id)
+            if check_employee_data:
+                return get_error_response_400("Employee payment details exists")
+
+            serialized_payment = PaymentsSerializer(data=payment_detail)
+            if serialized_payment.is_valid():
+                serialized_payment.save()
+                return get_success_response_200(serialized_payment.data)
+            else:
+                return get_error_response_400(serialized_payment.errors)
+        except Exception as exception:
+            return get_server_response_500(str(exception))
+
+    """
+    PATCH: Update the user detail by the employee_id
+    """
+
+    def patch(self, request):
+        update_details = request.data
+
+        if not is_user_manager_or_admin(request.user.user_role):
+            return get_error_response_400("Only admin and managers can add user payment detail")
+
+        if "employee_id" not in update_details:
+            return get_error_response_400("Employee id is required")
+
+        try:
+            req_employee_id = update_details.get("employee_id")
+            employee_to_be_updated = Payments.objects.get(employee_id=req_employee_id)
+            serialized_data = PaymentsSerializer(employee_to_be_updated, data=update_details, partial=True)
+
+            if serialized_data.is_valid():
+                serialized_data.save()
+                return get_success_response_200(serialized_data.data)
+
+        except Exception as exception:
+            return get_error_response_400(str(exception))
