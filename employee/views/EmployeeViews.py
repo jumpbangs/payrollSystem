@@ -258,7 +258,7 @@ class PaymentView(APIView):
             return get_server_response_500(str(exception))
 
     """
-    PATCH: Update the user detail by the employee_id
+    PATCH: Update the user payment detail by the employee_id
     """
 
     def patch(self, request):
@@ -279,5 +279,28 @@ class PaymentView(APIView):
                 serialized_data.save()
                 return get_success_response_200(serialized_data.data)
 
+        except Exception as exception:
+            return get_error_response_400(str(exception))
+
+    """
+    DELETE : Delete the user payment detail by employee_id
+    """
+
+    def delete(self, request):
+        req_employee_id = request.data.get("employee_id")
+
+        if not is_user_manager_or_admin(request.user.user_role):
+            return get_error_response_400("Only admin and managers can delete user payment details")
+
+        if req_employee_id is None:
+            return get_error_response_400("employee_id is required")
+
+        try:
+            employee_payment_detail = Payments.objects.get(employee_id=req_employee_id)
+            employee_payment_detail.delete()
+            return get_success_response_200("Employee's payment detail has been deleted")
+
+        except Payments.DoesNotExist:
+            return get_error_response_400("Given employee's payment detail does not exist")
         except Exception as exception:
             return get_error_response_400(str(exception))
