@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 
 from backend.networkHelpers import (
     get_error_response_400,
+    get_error_response_401,
     get_error_response_404,
     get_server_response_500,
     get_success_response_200,
@@ -36,6 +37,7 @@ class CityModelView(APIView):
                 city = City.objects.all()
                 serialized_data = CitySerializer(city, many=True)
                 return get_success_response_200(serialized_data.data)
+
         except Exception as exception:
             return get_server_response_500(str(exception))
 
@@ -49,7 +51,7 @@ class CityModelView(APIView):
         city_state = city_data.get("state")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and manager can add new cities")
+            return get_error_response_401("Only admin and manager can add new cities")
 
         if is_none_or_empty(city_data):
             return get_error_response_400("City data cannot be empty")
@@ -70,6 +72,7 @@ class CityModelView(APIView):
                 return get_success_response_200(serialized_data.data)
             else:
                 return get_error_response_400("City data is invalid")
+
         except Exception as exception:
             return get_server_response_500(str(exception))
 
@@ -82,7 +85,7 @@ class CityModelView(APIView):
         city_id = city_data.get("city_id")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and manager can update cities")
+            return get_error_response_401("Only admin and manager can update cities")
 
         if is_none_or_empty(city_data):
             return get_error_response_400("City data cannot be empty")
@@ -98,6 +101,7 @@ class CityModelView(APIView):
                 return get_success_response_200(serialized_data.data)
             else:
                 return get_error_response_400("City data is invalid")
+
         except City.DoesNotExist:
             return get_error_response_404("City not found or doesn't exist")
         except Exception as exception:
@@ -112,7 +116,7 @@ class CityModelView(APIView):
         city_id = city_data.get("city_id")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and manager can delete cities")
+            return get_error_response_401("Only admin and manager can delete cities")
 
         if is_none_or_empty(city_id):
             return get_error_response_400("City id cannot be empty")
@@ -121,6 +125,7 @@ class CityModelView(APIView):
             city_data_to_delete = City.objects.get(pk=city_id)
             city_data_to_delete.delete()
             return get_success_response_200("City deleted successfully")
+
         except City.DoesNotExist:
             return get_error_response_404("City not found")
         except Exception as exception:

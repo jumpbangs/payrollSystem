@@ -4,6 +4,8 @@ from rest_framework.views import APIView
 
 from backend.networkHelpers import (
     get_error_response_400,
+    get_error_response_401,
+    get_error_response_404,
     get_server_response_500,
     get_success_response_200,
 )
@@ -41,7 +43,7 @@ class AddressModelView(APIView):
                 return get_success_response_200(serialized_data.data)
 
             except Address.DoesNotExist:
-                return get_error_response_400("Address not found or doesn't exist")
+                return get_error_response_404("Address not found or doesn't exist")
             except Exception as exception:
                 return get_server_response_500(str(exception))
 
@@ -54,7 +56,7 @@ class AddressModelView(APIView):
         address = address_data.get("address")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and manager can add new addresses")
+            return get_error_response_401("Only admin and manager can add new addresses")
 
         if is_none_or_empty(address_data):
             return get_error_response_400("Address data cannot be empty")
@@ -88,7 +90,7 @@ class AddressModelView(APIView):
         updated_address = address_data.get("address")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and manager can update addresses")
+            return get_error_response_401("Only admin and manager can update addresses")
 
         if is_none_or_empty(updated_address):
             return get_error_response_400("Address cannot be empty")

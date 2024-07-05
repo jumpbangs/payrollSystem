@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 
 from backend.networkHelpers import (
     get_error_response_400,
+    get_error_response_401,
     get_error_response_404,
     get_server_response_500,
     get_success_response_200,
@@ -29,6 +30,7 @@ class CountryModelView(APIView):
             country = Country.objects.all()
             serialized_data = CountrySerializer(country, many=True)
             return get_success_response_200(serialized_data.data)
+
         except Exception as exception:
             return get_server_response_500(str(exception))
 
@@ -41,7 +43,7 @@ class CountryModelView(APIView):
         country_name = country_data.get("country_name")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and manager can add new countries")
+            return get_error_response_401("Only admin and manager can add new countries")
 
         if is_none_or_empty(country_data):
             return get_error_response_400("Country data cannot be empty")
@@ -62,6 +64,7 @@ class CountryModelView(APIView):
                 return get_success_response_200(serialized_data.data)
             else:
                 return get_error_response_400("Country data is invalid")
+
         except Exception as exception:
             return get_server_response_500(str(exception))
 
@@ -74,7 +77,7 @@ class CountryModelView(APIView):
         country_id = country_data.get("country_id")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and manager can update countries")
+            return get_error_response_401("Only admin and manager can update countries")
 
         if is_none_or_empty(country_data):
             return get_error_response_400("Country data cannot be empty")
@@ -90,6 +93,7 @@ class CountryModelView(APIView):
                 return get_success_response_200(serialized_data.data)
             else:
                 return get_error_response_400("Country data is invalid")
+
         except Country.DoesNotExist:
             return get_error_response_404("Country not found or doesn't exist")
         except Exception as exception:

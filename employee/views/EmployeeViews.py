@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 
 from backend.networkHelpers import (
     get_error_response_400,
+    get_error_response_401,
+    get_error_response_403,
     get_error_response_404,
     get_server_response_500,
     get_success_response_200,
@@ -35,7 +37,7 @@ class EmployeeModelView(APIView):
         employee_id = request.data.get("user_id")
         if is_none_or_empty(employee_id):
             if not is_user_manager_or_admin(request.user.user_role):
-                return get_error_response_404("Only admin and manager can fetch all employees")
+                return get_error_response_403("Only admin and manager can fetch all employees")
 
             try:
                 employee_data = Employee.objects.all().exclude(user_id=request.user.user_id)
@@ -63,7 +65,7 @@ class EmployeeModelView(APIView):
         employee_data = request.data
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and manager can add new employees")
+            return get_error_response_403("Only admin and manager can add new employees")
 
         if is_none_or_empty(employee_data):
             return get_error_response_400("Employee data cannot be empty")
@@ -91,6 +93,7 @@ class EmployeeModelView(APIView):
         employee_data = request.data
         user_id = employee_data.get("user_id")
         is_allowed_to_update = False
+
         if is_none_or_empty(employee_data):
             return get_error_response_400("Employee data cannot be empty")
 
@@ -101,12 +104,12 @@ class EmployeeModelView(APIView):
             is_allowed_to_update = True
 
         if not is_user_admin(request.user.user_role) and employee_data.get("user_role") is not None:
-            return get_error_response_400("Only admin can update employee role")
+            return get_error_response_401("Only admin can update employee role")
 
         try:
             employee_data_to_update: Employee = Employee.objects.get(pk=user_id)
             if employee_data_to_update.user_id != request.user.user_id and not is_allowed_to_update:
-                return get_error_response_400("You are can only update your own profile")
+                return get_error_response_401("You are can only update your own profile")
 
             serialized_data = EmployeeSerializer(employee_data_to_update, data=employee_data, partial=True)
             if serialized_data.is_valid():
@@ -127,7 +130,7 @@ class EmployeeModelView(APIView):
         user_id = employee_data.get("user_id")
 
         if not is_user_admin(request.user.user_role):
-            return get_error_response_400("Only admin can delete employees")
+            return get_error_response_401("Only admin can delete employees")
 
         if is_none_or_empty(user_id):
             return get_error_response_400("Employee id cannot be empty")
@@ -152,7 +155,7 @@ class EmploymentTermsView(APIView):
 
     def get(self, request):
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and manager can fetch all employment terms")
+            return get_error_response_401("Only admin and manager can fetch all employment terms")
 
         try:
             employment_terms_data = EmploymentTerms.objects.all()
@@ -171,7 +174,7 @@ class EmploymentTermsView(APIView):
         employee_id = employment_term_data.get("employee_id")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and manager can update employment terms")
+            return get_error_response_401("Only admin and manager can update employment terms")
 
         if is_none_or_empty(employment_term_data):
             return get_error_response_400("Employment term data cannot be empty")
@@ -215,7 +218,7 @@ class PaymentView(APIView):
                     return get_success_response_200(serialized_payment.data)
 
             except Exception as exception:
-                return get_error_response_400(str(exception))
+                return get_server_response_500(str(exception))
 
         if is_user_admin(request.user.user_role):
             if is_none_or_empty(req_employee_id):
@@ -235,7 +238,7 @@ class PaymentView(APIView):
         required_fields = ["employee_id", "gross_salary", "net_salary", "tax"]
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and managers can add user payment detail")
+            return get_error_response_401("Only admin and managers can add user payment detail")
 
         # Check for required fields
         missing_fields = [field for field in required_fields if field not in payment_detail]
@@ -265,7 +268,7 @@ class PaymentView(APIView):
         update_details = request.data
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and managers can add user payment detail")
+            return get_error_response_401("Only admin and managers can add user payment detail")
 
         if "employee_id" not in update_details:
             return get_error_response_400("Employee id is required")
@@ -280,7 +283,7 @@ class PaymentView(APIView):
                 return get_success_response_200(serialized_data.data)
 
         except Exception as exception:
-            return get_error_response_400(str(exception))
+            return get_server_response_500(str(exception))
 
     """
     DELETE : Delete the user payment detail by employee_id
@@ -290,7 +293,7 @@ class PaymentView(APIView):
         req_employee_id = request.data.get("employee_id")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only admin and managers can delete user payment details")
+            return get_error_response_401("Only admin and managers can delete user payment details")
 
         if req_employee_id is None:
             return get_error_response_400("employee_id is required")
@@ -301,6 +304,6 @@ class PaymentView(APIView):
             return get_success_response_200("Employee's payment detail has been deleted")
 
         except Payments.DoesNotExist:
-            return get_error_response_400("Given employee's payment detail does not exist")
+            return get_error_response_404("Given employee's payment detail does not exist")
         except Exception as exception:
-            return get_error_response_400(str(exception))
+            return get_server_response_500(str(exception))

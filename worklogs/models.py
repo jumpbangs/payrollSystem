@@ -55,8 +55,8 @@ class Clients(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return str(self.id)
+    def __str__(self) -> str:
+        return f"{self.id} --> {self.client_name} --> {self.client_email}"
 
 
 class WorklogDetails(models.Model):
