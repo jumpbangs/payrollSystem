@@ -100,9 +100,6 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         else:
             super().save(*args, **kwargs)
 
-    def __str__(self) -> str:
-        return f"Employee name: {self.first_name} ==> user_id: {self.user_id} ===> email: {self.email}"
-
     def set_password(self, password):
         self.password = make_password(password)
         return self.password
@@ -121,9 +118,6 @@ class EmploymentTerms(models.Model):
     end_date = models.DateField(null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self) -> str:
-        return f"{self.employee_id}"
 
 
 class Payments(models.Model):
