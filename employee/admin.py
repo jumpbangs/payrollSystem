@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib.auth.models import Group
+from rest_framework.authtoken.models import TokenProxy
 
 from .models import Employee, EmploymentTerms, Payments
 
@@ -27,6 +29,10 @@ class PaymentsAdmin(admin.ModelAdmin):
         full_name = obj.employee_id.first_name + " " + last_name
         return full_name
 
+
+# Hide Token and Groups from the Admin Panel
+admin.site.unregister(TokenProxy)
+admin.site.unregister(Group)
 
 # Register your models here.
 admin.site.register(Employee, EmployeeAdmin)
