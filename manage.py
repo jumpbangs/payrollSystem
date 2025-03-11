@@ -3,6 +3,14 @@
 import os
 import sys
 
+import pyfiglet
+
+
+def print_banner():
+    text = "Payroll System"
+    figlet_text = pyfiglet.figlet_format(text)
+    print(figlet_text)  # noqa: T201
+
 
 def main():
     """Run administrative tasks."""
@@ -19,4 +27,6 @@ def main():
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "runserver" and os.environ.get("RUN_MAIN") != "true":
+        print_banner()
     main()
