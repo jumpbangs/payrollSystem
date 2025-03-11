@@ -19,15 +19,19 @@ class EmployeeTermsAdmin(admin.ModelAdmin):
         full_name = obj.employee_id.first_name + " " + last_name
         return full_name
 
+    get_employee_name.short_description = "Employee Name"
+
 
 class PaymentsAdmin(admin.ModelAdmin):
     list_display = ("id", "get_employee_name", "employee_id")
-    search_fields = ("id", "employee_id__first_name", "employee_id_last_name", "employee_id")
+    search_fields = ("id", "employee_id__first_name", "employee_id__last_name", "employee_id")
 
     def get_employee_name(self, obj):
         last_name = obj.employee_id.last_name if obj.employee_id.last_name != None else " "
         full_name = obj.employee_id.first_name + " " + last_name
         return full_name
+
+    get_employee_name.short_description = "Employee Name"
 
 
 # Hide Token and Groups from the Admin Panel

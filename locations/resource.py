@@ -3,6 +3,8 @@ from import_export import resources
 from .models import Address, City, Country
 
 
+# The following file contains the implementation of using
+# resources from import_export for export of CSV file in the django admin panel
 class AddressResource(resources.ModelResource):
     class Meta:
         model = Address
