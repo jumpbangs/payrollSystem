@@ -55,7 +55,7 @@ class ClientModelView(APIView):
         req_client_data = request.data
         required_fields = ["client_name", "client_email", "client_contact"]
 
-        if is_user_manager_or_admin(request.user.user_role):
+        if not is_user_manager_or_admin(request.user.user_role):
             return get_error_response_401("Only managers and admins can add client data")
 
         missing_fields = [field for field in required_fields if field not in req_client_data]
