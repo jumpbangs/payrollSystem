@@ -1,3 +1,5 @@
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from backend.networkHelpers import (
@@ -7,18 +9,146 @@ from backend.networkHelpers import (
     get_server_response_500,
     get_success_response_200,
 )
+from backend.paginationHelpers import CustomPagination
+from backend.utils.dateUtils import get_current_date
 from backend.utils.helpers import is_none_or_empty, is_user_manager_or_admin
-from worklogs.models import WorklogDetails
-from worklogs.seralizers import WorklogDetailSerializer
+from worklogs.models import WorklogDetails, Worklogs
+from worklogs.seralizers import (
+    WorklogDetailSerializer,
+    WorklogMinSerializer,
+    WorklogSerializer,
+)
 
 
 # Create your views here.
 class WorklogModelView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+
+    """
+    GET: Fetch Worklogs or a single worklog
+    """
+
     def get(self, request):
-        return get_success_response_200("Worklog data fetched successfully")
+        req_worklog_id = request.data.get("worklog_id")
+        user_id = request.user.user_id
+
+        if is_none_or_empty(req_worklog_id):
+            try:
+                worklog_obj = Worklogs.objects.filter(employee_id=user_id)
+                serialized_data = WorklogMinSerializer(worklog_obj, many=True)
+                return get_success_response_200(serialized_data.data)
+            except Exception as exception:
+                return get_server_response_500(str(exception))
+
+        else:
+            try:
+                worklog_obj = Worklogs.objects.filter(id=req_worklog_id, employee_id=user_id).first()
+                if worklog_obj is None:
+                    return get_success_response_200("No worklogs found")
+                else:
+                    serialized_data = WorklogSerializer(worklog_obj)
+                    return get_success_response_200(serialized_data.data)
+
+            except Worklogs.DoesNotExist:
+                return get_error_response_404("Worklog not found")
+            except Exception as exception:
+                return get_server_response_500(str(exception))
+
+    """
+    POST: Create new worklog
+    """
+
+    def post(self, request):
+        worklog_data = request.data
+        user_id = request.user.user_id
+        required_fields = ["worklog_detail_id", "start_time", "end_time", "description", "worklog_type"]
+
+        if is_none_or_empty(worklog_data):
+            return get_error_response_400("Worklog data empty")
+
+        missing_fields = [field for field in required_fields if field not in worklog_data]
+        if missing_fields:
+            return get_error_response_400(f"Missing fields: {', '.join(missing_fields)}")
+
+        if "worklog_date" not in worklog_data:
+            worklog_data["worklog_date"] = get_current_date()
+
+        try:
+            worklog_data["employee_id"] = user_id
+            serialized_worklog_entry = WorklogSerializer(data=worklog_data)
+
+            if serialized_worklog_entry.is_valid():
+                serialized_worklog_entry.save()
+                return get_success_response_200(serialized_worklog_entry.data)
+            else:
+                return get_error_response_400("Invalid worklog data")
+        except Exception as exception:
+            return get_server_response_500(str(exception))
+
+    """
+    PATCH: Update given worklog by worklog_id
+    """
+
+    def patch(self, request):
+        worklog_data = request.data
+        user_id = request.user.user_id
+        worklog_id = worklog_data.get("worklog_id")
+
+        if is_none_or_empty(worklog_data):
+            return get_error_response_400("Worklog data empty")
+
+        if worklog_data.get("worklog_id") is None:
+            return get_error_response_400("Worklog id required")
+
+        try:
+            worklog_to_update = Worklogs.objects.filter(id=worklog_id, employee_id=user_id).first()
+
+            if worklog_to_update is None:
+                return get_error_response_400("Worklog does not belong to the user")
+
+            serialized_worklog = WorklogSerializer(worklog_to_update, data=worklog_data, partial=True)
+            if serialized_worklog.is_valid():
+                return get_success_response_200(serialized_worklog.data)
+            else:
+                return get_error_response_400(str(serialized_worklog.errors))
+
+        except Worklogs.DoesNotExist:
+            return get_error_response_404("Invalid worklog id")
+        except Exception as exception:
+            return get_server_response_500(str(exception))
+
+    """
+    DELETE: Delete the given worklog by worklog_id
+    """
+
+    def delete(self, request):
+        user_role = request.user.user_role
+        user_id = request.user.user_id
+        worklog_id = request.data.get("worklog_id")
+
+        if is_none_or_empty(worklog_id):
+            return get_error_response_400("Worklog_id is required")
+
+        try:
+            worklog_to_delete_obj = Worklogs.objects.filter(pk=worklog_id).first()
+            if is_user_manager_or_admin(user_role) or worklog_to_delete_obj.employee_id.user_id == user_id:
+                worklog_to_delete_obj.delete()
+                return get_success_response_200("Worklog deleted")
+            else:
+                return get_error_response_400("only managers, admin or the owner can delete the following worklog")
+
+        except Worklogs.DoesNotExist:
+            return get_error_response_400("Worklog_id is invalid")
+        except Exception as exception:
+            return get_server_response_500(str(exception))
 
 
 class WorklogDetailModelView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     """
     GET: Fetch detail for worklog
     """
