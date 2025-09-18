@@ -8,8 +8,8 @@ python manage.py makemigrations --noinput
 echo "Migrating"
 python manage.py migrate --noinput
 
-echo "Popluating database"
-python manage.py employee_inital_data
-python manage.py location_inital_data
+echo "Populating database"
+python manage.py employee_initial_data
+python manage.py location_initial_data
 
 echo "Done"

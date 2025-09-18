@@ -31,10 +31,10 @@ class Clients(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"{self.id} --> {self.client_name} --> {self.client_email}"
+        return f"{self.id} --> {self.client_name} --> {self.client_email} --> {self.client_address}"
 
 
-class WorklogDetails(models.Model):
+class Jobs(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     client_id = models.ForeignKey(Clients, on_delete=models.CASCADE, null=True, default=None)
     billed_hours = models.DecimalField(null=True, default=0, decimal_places=1, max_digits=10)
@@ -52,7 +52,7 @@ class WorklogDetails(models.Model):
 class Worklogs(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, default=None)
-    worklog_detail_id = models.ForeignKey(WorklogDetails, on_delete=models.CASCADE, null=True, default=None)
+    job_id = models.ForeignKey(Jobs, on_delete=models.CASCADE, null=True, default=None, related_name="Job")
     worklog_date = models.DateField(null=True, default=None)
     start_time = models.TimeField(null=True, default=None)
     end_time = models.TimeField(null=True, default=None)
