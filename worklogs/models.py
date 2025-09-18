@@ -24,7 +24,7 @@ class Clients(models.Model):
     client_email = models.EmailField(max_length=225, null=True, default=None)
     client_contact = models.IntegerField(null=True, default=None)
     client_address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, default=None)
-    client_details = models.JSONField(null=True)
+    client_details = models.JSONField(null=True, default=None)
     last_invoiced = models.DateField(null=True, default=None)
     is_client_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
