@@ -166,7 +166,7 @@ class EmploymentTermsView(APIView):
             return get_server_response_500(str(exception))
 
     """
-    PUT: Update employment term
+    PATCH: Update employment term
     """
 
     def patch(self, request):
