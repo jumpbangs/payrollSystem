@@ -12,6 +12,11 @@ from backend.networkHelpers import (
     get_success_response_200,
 )
 from backend.utils.helpers import is_none_or_empty
+from employee.docs.auth_schema import (
+    change_password_schema,
+    login_schema,
+    logout_schema,
+)
 from employee.models import Employee
 from employee.serializers import EmployeeSerializer
 
@@ -23,6 +28,7 @@ class LoginView(APIView):
     POST: Login API for Users
     """
 
+    @login_schema
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
@@ -58,6 +64,7 @@ class LogoutView(APIView):
     DELETE: Logout API for Logging out users
     """
 
+    @logout_schema
     def delete(self, request):
         if request.user.is_authenticated:
             request.user.auth_token.delete()
@@ -75,6 +82,7 @@ class ChangePasswordView(APIView):
     POST: Change password for users API
     """
 
+    @change_password_schema
     def post(self, request):
         if request.user.is_authenticated:
             old_password = request.data.get("old_password")

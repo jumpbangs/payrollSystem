@@ -16,6 +16,22 @@ from backend.utils.helpers import (
     is_user_admin,
     is_user_manager_or_admin,
 )
+from employee.docs.employee_schema import (
+    delete_employee_schema,
+    get_employee_schema,
+    patch_employee_schema,
+    post_employee_schema,
+)
+from employee.docs.payment_schema import (
+    delete_payment_schema,
+    get_payment_schema,
+    patch_payment_schema,
+    post_payment_schema,
+)
+from employee.docs.term_schema import (
+    get_employee_term_schema,
+    patch_employee_term_schema,
+)
 from employee.models import Employee, EmploymentTerms, Payments
 from employee.serializers import (
     EmployeeSerializer,
@@ -33,8 +49,9 @@ class EmployeeModelView(APIView):
     GET: Fetch Employee data by id else fetch all
     """
 
+    @get_employee_schema
     def get(self, request):
-        employee_id = request.data.get("user_id")
+        employee_id = request.query_params.get("user_id")
         if is_none_or_empty(employee_id):
             if not is_user_manager_or_admin(request.user.user_role):
                 return get_error_response_403("Only admin and manager can fetch all employees")
@@ -48,7 +65,7 @@ class EmployeeModelView(APIView):
                 return get_server_response_500(str(exception))
         else:
             try:
-                employee_data = Employee.objects.filter(user_id__in=employee_id)
+                employee_data = Employee.objects.filter(user_id=employee_id)
                 serialized_data = EmployeeSerializer(employee_data, many=True)
                 return get_success_response_200(serialized_data.data)
 
@@ -61,6 +78,7 @@ class EmployeeModelView(APIView):
     POST: Add new Employee
     """
 
+    @post_employee_schema
     def post(self, request):
         employee_data = request.data
 
@@ -89,6 +107,7 @@ class EmployeeModelView(APIView):
     PATCH: Update Employee
     """
 
+    @patch_employee_schema
     def patch(self, request):
         employee_data = request.data
         user_id = employee_data.get("user_id")
@@ -125,6 +144,7 @@ class EmployeeModelView(APIView):
     DELETE: Delete Employee
     """
 
+    @delete_employee_schema
     def delete(self, request):
         employee_data = request.data
         user_id = employee_data.get("user_id")
@@ -153,22 +173,32 @@ class EmploymentTermsView(APIView):
     GET: Fetch all employment terms
     """
 
+    @get_employee_term_schema
     def get(self, request):
+        employee_id = request.query_params.get("employee_id")
         if not is_user_manager_or_admin(request.user.user_role):
             return get_error_response_401("Only admin and manager can fetch all employment terms")
 
-        try:
-            employment_terms_data = EmploymentTerms.objects.all()
-            serialized_data = EmploymentTermsSerializer(employment_terms_data, many=True)
-            return get_success_response_200(serialized_data.data)
-
-        except Exception as exception:
-            return get_server_response_500(str(exception))
+        if is_none_or_empty(employee_id):
+            try:
+                employment_terms_data = EmploymentTerms.objects.all()
+                serialized_data = EmploymentTermsSerializer(employment_terms_data, many=True)
+                return get_success_response_200(serialized_data.data)
+            except Exception as exception:
+                return get_server_response_500(str(exception))
+        else:
+            try:
+                employee_term_data = EmploymentTerms.objects.filter(employee_id=employee_id)
+                serialized_data = EmploymentTermsSerializer(employee_term_data, many=False)
+                return get_success_response_200(serialized_data.data)
+            except Exception as exception:
+                return get_server_response_500(str(exception))
 
     """
     PATCH: Update employment term
     """
 
+    @patch_employee_term_schema
     def patch(self, request):
         employment_term_data = request.data
         employee_id = employment_term_data.get("employee_id")
@@ -205,8 +235,9 @@ class PaymentView(APIView):
     GET: Fetch payment view for employee/employees
     """
 
+    @get_payment_schema
     def get(self, request):
-        req_employee_id = request.data.get("employee_id")
+        req_employee_id = request.query_params.get("employee_id")
 
         def get_employee_payment(given_employee_id):
             try:
@@ -233,6 +264,7 @@ class PaymentView(APIView):
     POST: Add payment to user detail
     """
 
+    @post_payment_schema
     def post(self, request):
         payment_detail = request.data
         required_fields = ["employee_id", "gross_salary", "net_salary", "tax"]
@@ -264,6 +296,7 @@ class PaymentView(APIView):
     PATCH: Update the user payment detail by the employee_id
     """
 
+    @patch_payment_schema
     def patch(self, request):
         update_details = request.data
 
@@ -289,6 +322,7 @@ class PaymentView(APIView):
     DELETE : Delete the user payment detail by employee_id
     """
 
+    @delete_payment_schema
     def delete(self, request):
         req_employee_id = request.data.get("employee_id")
 

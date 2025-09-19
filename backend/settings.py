@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "employee",
     "locations",
     "worklogs",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -133,9 +134,18 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Payroll System",
+    "DESCRIPTION": "API Swagger for Payroll System Application",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
+    "TAGS": [{"name": "Auth", "description": "Auth endpoints"}, {"name": "Employee"}, {"name": "Employee Payment"}],
+}
 
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "PAGE_SIZE": 2,
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
