@@ -4,7 +4,6 @@ from drf_spectacular.utils import (
     OpenApiTypes,
     extend_schema,
 )
-from rest_framework import serializers
 
 from locations.serializers import CitySerializer
 
@@ -64,13 +63,17 @@ update_city_schema = extend_schema(
     tags=[CITY_TAG],
 )
 
-
-class DeleteCitySchema(serializers.Serializer):
-    city_id = serializers.UUIDField()
-
-
 delete_city_schema = extend_schema(
-    request=DeleteCitySchema,
+    parameters=[
+        OpenApiParameter(
+            name="city_id",
+            type=OpenApiTypes.UUID,
+            location=OpenApiParameter.QUERY,
+            many=False,
+            required=False,
+            description="Delete city by the given city_id.",
+        )
+    ],
     responses={
         200: OpenApiResponse(description="City deleted successfully"),
         400: OpenApiResponse(description="City id cannot be empty"),

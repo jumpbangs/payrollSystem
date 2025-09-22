@@ -82,7 +82,16 @@ class DeletePaymentSchema(serializers.Serializer):
 
 
 delete_payment_schema = extend_schema(
-    request=DeletePaymentSchema,
+    parameters=[
+        OpenApiParameter(
+            name="employee_id",
+            type=OpenApiTypes.UUID,
+            location=OpenApiParameter.QUERY,
+            many=False,
+            required=False,
+            description="Employee to delete by given employee_id.",
+        )
+    ],
     responses={
         200: OpenApiResponse(description="Employee's payment detail has been deleted"),
         400: OpenApiResponse(description="employee_id is required"),

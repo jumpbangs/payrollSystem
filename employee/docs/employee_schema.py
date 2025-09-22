@@ -86,12 +86,17 @@ patch_employee_schema = extend_schema(
 )
 
 
-class DeleteEmployeeSchema(serializers.Serializer):
-    user_id = serializers.UUIDField()
-
-
 delete_employee_schema = extend_schema(
-    request=DeleteEmployeeSchema,
+    parameters=[
+        OpenApiParameter(
+            name="user_id",
+            type=OpenApiTypes.UUID,
+            location=OpenApiParameter.QUERY,
+            many=False,
+            required=True,
+            description="Employee to delete by user_id",
+        )
+    ],
     responses={
         200: OpenApiResponse(description="Employee deleted successfully"),
         400: OpenApiResponse(description="Employee id cannot be empty"),

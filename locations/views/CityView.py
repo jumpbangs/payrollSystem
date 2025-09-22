@@ -122,8 +122,7 @@ class CityModelView(APIView):
 
     @delete_city_schema
     def delete(self, request):
-        city_data = request.data
-        city_id = city_data.get("city_id")
+        city_id = request.query_params.get("city_id")
 
         if not is_user_manager_or_admin(request.user.user_role):
             return get_error_response_401("Only admin and manager can delete cities")

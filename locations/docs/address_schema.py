@@ -80,7 +80,16 @@ class DeleteAddressSchema(serializers.Serializer):
 
 
 delete_address_schema = extend_schema(
-    request=DeleteAddressSchema,
+    parameters=[
+        OpenApiParameter(
+            name="address_id",
+            type=OpenApiTypes.UUID,
+            location=OpenApiParameter.QUERY,
+            many=False,
+            required=False,
+            description="Delete address by address_id",
+        )
+    ],
     responses={
         200: OpenApiResponse(description="Address deleted successfully"),
         400: OpenApiResponse(

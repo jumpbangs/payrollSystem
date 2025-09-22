@@ -10,6 +10,7 @@ from backend.networkHelpers import (
     get_error_response_404,
     get_server_response_500,
     get_success_response_200,
+    get_success_response_201,
 )
 from backend.utils.helpers import (
     is_none_or_empty,
@@ -98,7 +99,8 @@ class EmployeeModelView(APIView):
             try:
                 new_employee = Employee.objects.create(**employee_data)
                 new_employee.save()
-                return get_success_response_200("Employee added successfully")
+                new_employee_data = EmployeeSerializer(new_employee)
+                return get_success_response_201(new_employee_data.data)
 
             except Exception as exception:
                 return get_server_response_500(str(exception))
@@ -146,8 +148,7 @@ class EmployeeModelView(APIView):
 
     @delete_employee_schema
     def delete(self, request):
-        employee_data = request.data
-        user_id = employee_data.get("user_id")
+        user_id = request.query_params.get("user_id")
 
         if not is_user_admin(request.user.user_role):
             return get_error_response_401("Only admin can delete employees")
@@ -286,7 +287,7 @@ class PaymentView(APIView):
             serialized_payment = PaymentsSerializer(data=payment_detail)
             if serialized_payment.is_valid():
                 serialized_payment.save()
-                return get_success_response_200(serialized_payment.data)
+                return get_success_response_201(serialized_payment.data)
             else:
                 return get_error_response_400(serialized_payment.errors)
         except Exception as exception:
@@ -324,7 +325,7 @@ class PaymentView(APIView):
 
     @delete_payment_schema
     def delete(self, request):
-        req_employee_id = request.data.get("employee_id")
+        req_employee_id = request.query_params.get("employee_id")
 
         if not is_user_manager_or_admin(request.user.user_role):
             return get_error_response_401("Only admin and managers can delete user payment details")

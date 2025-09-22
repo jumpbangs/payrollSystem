@@ -125,14 +125,10 @@ class AddressModelView(APIView):
 
     @delete_address_schema
     def delete(self, request):
-        address_data = request.data
-        address_id = address_data.get("address_id")
+        address_id = request.query_params.get("address_id")
 
         if not is_user_manager_or_admin(request.user.user_role):
             return get_error_response_401("Only admin and manager can delete addresses")
-
-        if is_none_or_empty(address_data):
-            return get_error_response_400("Address data cannot be empty")
 
         if is_none_or_empty(address_id):
             return get_error_response_400("Address cannot be empty")
