@@ -8,6 +8,8 @@ from rest_framework import serializers
 
 from employee.serializers import EmployeeSerializer
 
+EMPLOYEE_TAGS = "Employee"
+
 
 class EmployeeRequestSerializer(serializers.Serializer):
     user_id = serializers.ListField(child=serializers.UUIDField(), allow_empty=False, help_text="List of user IDs")
@@ -32,7 +34,7 @@ get_employee_schema = extend_schema(
         500: OpenApiResponse(description="Server error"),
     },
     description="Fetching employee data by id or fetch all",
-    tags=["Employee"],
+    tags=[EMPLOYEE_TAGS],
 )
 
 post_employee_schema = extend_schema(
@@ -51,7 +53,7 @@ post_employee_schema = extend_schema(
         500: OpenApiResponse(description="Server error"),
     },
     description="Add new employee data",
-    tags=["Employee"],
+    tags=[EMPLOYEE_TAGS],
 )
 
 
@@ -80,7 +82,7 @@ patch_employee_schema = extend_schema(
         500: OpenApiResponse(description="Server error"),
     },
     description="Update employee data by user_id",
-    tags=["Employee"],
+    tags=[EMPLOYEE_TAGS],
 )
 
 
@@ -98,5 +100,5 @@ delete_employee_schema = extend_schema(
         500: OpenApiResponse(description="Server error"),
     },
     description="Delete employee by their user_id",
-    tags=["Employee"],
+    tags=[EMPLOYEE_TAGS],
 )

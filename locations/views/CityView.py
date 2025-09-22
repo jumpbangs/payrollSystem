@@ -11,6 +11,12 @@ from backend.networkHelpers import (
 )
 from backend.paginationHelpers import CustomPagination
 from backend.utils.helpers import is_none_or_empty, is_user_manager_or_admin
+from locations.docs.city_schema import (
+    delete_city_schema,
+    get_city_schema,
+    post_city_schema,
+    update_city_schema,
+)
 from locations.models import City
 from locations.serializers import CitySerializer
 
@@ -25,8 +31,9 @@ class CityModelView(APIView):
     GET: Fetch a city by city_id, state or name
     """
 
+    @get_city_schema
     def get(self, request):
-        city_id = request.GET.get("city_id", None)
+        city_id = request.query_params.get("city_id", None)
 
         try:
             if city_id is not None:
@@ -45,6 +52,7 @@ class CityModelView(APIView):
     POST: Add a city
     """
 
+    @post_city_schema
     def post(self, request):
         city_data = request.data
         city_name = city_data.get("city_name")
@@ -80,6 +88,7 @@ class CityModelView(APIView):
     PUT: Update a city
     """
 
+    @update_city_schema
     def put(self, request):
         city_data = request.data
         city_id = city_data.get("city_id")
@@ -111,6 +120,7 @@ class CityModelView(APIView):
     DELETE: Delete a city
     """
 
+    @delete_city_schema
     def delete(self, request):
         city_data = request.data
         city_id = city_data.get("city_id")

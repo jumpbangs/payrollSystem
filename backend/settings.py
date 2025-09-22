@@ -140,7 +140,12 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
-    "TAGS": [{"name": "Auth", "description": "Auth endpoints"}, {"name": "Employee"}, {"name": "Employee Payment"}],
+    "TAGS": [
+        {"name": "Auth", "description": "Auth endpoints"},
+        {"name": "Address", "description": "Address endpoints"},
+        {"name": "Employee", "description": "Employee endpoints"},
+        {"name": "Employee Payment", "description": "Employee payment endpoints"},
+    ],
 }
 
 REST_FRAMEWORK = {

@@ -11,6 +11,11 @@ from backend.networkHelpers import (
 )
 from backend.paginationHelpers import CustomPagination
 from backend.utils.helpers import is_none_or_empty, is_user_manager_or_admin
+from locations.docs.coutry_schema import (
+    get_country_schema,
+    post_country_schema,
+    put_country_schema,
+)
 from locations.models import Country
 from locations.serializers import CountrySerializer
 
@@ -25,6 +30,7 @@ class CountryModelView(APIView):
     GET: Fetch all countries
     """
 
+    @get_country_schema
     def get(self, request):
         try:
             country = Country.objects.all()
@@ -38,6 +44,7 @@ class CountryModelView(APIView):
     POST: Add new country
     """
 
+    @post_country_schema
     def post(self, request):
         country_data = request.data
         country_name = country_data.get("country_name")
@@ -72,6 +79,7 @@ class CountryModelView(APIView):
     PUT: Update country
     """
 
+    @put_country_schema
     def put(self, request):
         country_data = request.data
         country_id = country_data.get("country_id")

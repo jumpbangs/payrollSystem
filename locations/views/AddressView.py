@@ -11,6 +11,12 @@ from backend.networkHelpers import (
 )
 from backend.paginationHelpers import CustomPagination
 from backend.utils.helpers import is_none_or_empty, is_user_manager_or_admin
+from locations.docs.address_schema import (
+    delete_address_schema,
+    get_address_schema,
+    post_address_schema,
+    put_address_schema,
+)
 from locations.models import Address
 from locations.serializers import AddressSerializer
 
@@ -25,8 +31,9 @@ class AddressModelView(APIView):
     GET: Fetch Address data by id else fetch all
     """
 
+    @get_address_schema
     def get(self, request):
-        address_data = request.data.get("address_id")
+        address_data = request.query_params.get("address_id")
 
         if is_none_or_empty(address_data):
             try:
@@ -51,6 +58,7 @@ class AddressModelView(APIView):
     POST: Add Address data
     """
 
+    @post_address_schema
     def post(self, request):
         address_data = request.data
         address = address_data.get("address")
@@ -84,6 +92,7 @@ class AddressModelView(APIView):
     PUT: Update Address data
     """
 
+    @put_address_schema
     def put(self, request):
         address_data = request.data
         address_id = address_data.get("address_id")
@@ -114,6 +123,7 @@ class AddressModelView(APIView):
     DELETE: Delete Address data
     """
 
+    @delete_address_schema
     def delete(self, request):
         address_data = request.data
         address_id = address_data.get("address_id")

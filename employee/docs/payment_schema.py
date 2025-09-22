@@ -8,6 +8,8 @@ from rest_framework import serializers
 
 from employee.serializers import PaymentsSerializer
 
+PAYMENT_TAG = "Employee Payment"
+
 get_payment_schema = extend_schema(
     parameters=[
         OpenApiParameter(
@@ -32,7 +34,7 @@ get_payment_schema = extend_schema(
         500: OpenApiResponse(description="Server error"),
     },
     description="Fetch employee payment terms",
-    tags=["Employee Payment"],
+    tags=[PAYMENT_TAG],
 )
 
 
@@ -54,7 +56,7 @@ post_payment_schema = extend_schema(
         500: OpenApiResponse(description="Server error"),
     },
     description="Add payment details to user detail",
-    tags=["Employee Payment"],
+    tags=[PAYMENT_TAG],
 )
 
 
@@ -71,7 +73,7 @@ patch_payment_schema = extend_schema(
         500: OpenApiResponse(description="Server error"),
     },
     description="Update the user payment detail by the employee_id",
-    tags=["Employee Payment"],
+    tags=[PAYMENT_TAG],
 )
 
 
@@ -89,5 +91,5 @@ delete_payment_schema = extend_schema(
         500: OpenApiResponse(description="Server error"),
     },
     description="Delete the user payment detail by employee_id",
-    tags=["Employee Payment"],
+    tags=[PAYMENT_TAG],
 )
