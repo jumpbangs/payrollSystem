@@ -10,8 +10,13 @@ from backend.networkHelpers import (
 )
 from backend.paginationHelpers import CustomPagination, PaginationHandlerMixin
 from backend.utils.helpers import is_none_or_empty, is_user_manager_or_admin
+from worklogs.docs.client_schema import (
+    get_client_schema,
+    patch_client_schema,
+    post_client_schema,
+)
 from worklogs.models import Clients
-from worklogs.seralizers import ClientMinSerializer, ClientSerializer
+from worklogs.serializers import ClientMinSerializer, ClientSerializer
 
 
 # Create your views here.
@@ -24,8 +29,9 @@ class ClientModelView(APIView, PaginationHandlerMixin):
     GET: Fetch client by id or fetch all
     """
 
+    @get_client_schema
     def get(self, request):
-        req_client_id = request.data.get("client_id")
+        req_client_id = request.query_params.get("client_id")
 
         if is_none_or_empty(req_client_id):
             try:
@@ -52,6 +58,7 @@ class ClientModelView(APIView, PaginationHandlerMixin):
     POST: Add client detail
     """
 
+    @post_client_schema
     def post(self, request):
         req_client_data = request.data
         required_fields = ["client_name", "client_email", "client_contact"]
@@ -84,6 +91,7 @@ class ClientModelView(APIView, PaginationHandlerMixin):
     PATCH: Update Client with given client id
     """
 
+    @patch_client_schema
     def patch(self, request):
         update_client_data = request.data
         details_to_update = update_client_data.get("client_details")

@@ -12,8 +12,14 @@ from backend.networkHelpers import (
 from backend.paginationHelpers import CustomPagination, PaginationHandlerMixin
 from backend.utils.dateUtils import get_current_date
 from backend.utils.helpers import is_none_or_empty, is_user_manager_or_admin
+from worklogs.docs.worklog_schema import (
+    delete_worklog_schema,
+    get_worklog_schema,
+    patch_worklog_schema,
+    post_worklog_schema,
+)
 from worklogs.models import Clients, Jobs, Worklogs
-from worklogs.seralizers import JobsSerializer, WorklogMinSerializer, WorklogSerializer
+from worklogs.serializers import JobsSerializer, WorklogMinSerializer, WorklogSerializer
 
 
 # Create your views here.
@@ -26,8 +32,9 @@ class WorklogModelView(APIView):
     GET: Fetch Worklogs or a single worklog
     """
 
+    @get_worklog_schema
     def get(self, request):
-        req_worklog_id = request.data.get("worklog_id")
+        req_worklog_id = request.query_params.get("worklog_id")
         user_id = request.user.user_id
 
         if is_none_or_empty(req_worklog_id):
@@ -56,13 +63,14 @@ class WorklogModelView(APIView):
     POST: Create new worklog
     """
 
+    @post_worklog_schema
     def post(self, request):
         worklog_data = request.data
         user_id = request.user.user_id
         required_fields = ["job_id", "start_time", "end_time", "description", "worklog_type"]
 
         if is_none_or_empty(worklog_data):
-            return get_error_response_400("Worklog data empty")
+            return get_error_response_400("Worklog data is empty")
 
         missing_fields = [field for field in required_fields if field not in worklog_data]
         if missing_fields:
@@ -87,16 +95,17 @@ class WorklogModelView(APIView):
     PATCH: Update given worklog by worklog_id
     """
 
+    @patch_worklog_schema
     def patch(self, request):
         worklog_data = request.data
         user_id = request.user.user_id
         worklog_id = worklog_data.get("worklog_id")
 
         if is_none_or_empty(worklog_data):
-            return get_error_response_400("Worklog data empty")
+            return get_error_response_400("Worklog data is empty")
 
         if worklog_data.get("worklog_id") is None:
-            return get_error_response_400("Worklog id required")
+            return get_error_response_400("Worklog id is required")
 
         try:
             worklog_to_update = Worklogs.objects.filter(id=worklog_id, employee_id=user_id).first()
@@ -119,6 +128,7 @@ class WorklogModelView(APIView):
     DELETE: Delete the given worklog by worklog_id
     """
 
+    @delete_worklog_schema
     def delete(self, request):
         user_role = request.user.user_role
         user_id = request.user.user_id
