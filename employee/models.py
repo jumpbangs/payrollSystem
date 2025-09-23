@@ -27,6 +27,7 @@ class EmploymentType(models.TextChoices):
 
 
 class UserRole(models.TextChoices):
+    SUPERVISOR = "S", "Supervisor"
     EMPLOYEE = "E", "Employee"
     MANAGER = "M", "Manager"
     ADMIN = "A", "Admin"

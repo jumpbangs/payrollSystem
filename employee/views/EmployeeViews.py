@@ -244,7 +244,7 @@ class PaymentView(APIView):
             try:
                 employee_payment = Payments.objects.filter(employee_id_id=given_employee_id)
                 if not employee_payment.exists():
-                    return get_error_response_400("Employee payment doesn't exist for the given employee")
+                    return get_error_response_400("Payment details doesn't exist for the given employee")
                 else:
                     serialized_payment = PaymentsSerializer(employee_payment, many=True)
                     return get_success_response_200(serialized_payment.data)
