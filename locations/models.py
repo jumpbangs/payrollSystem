@@ -13,6 +13,10 @@ class Country(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "Country"
+        verbose_name_plural = "Countries"
+
     def __str__(self) -> str:
         return f"{self.country_name}"
 
@@ -27,6 +31,10 @@ class City(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "City"
+        verbose_name_plural = "Cities"
+
     def __str__(self) -> str:
         return f"{self.city_name}"
 
@@ -38,10 +46,14 @@ class Address(models.Model):
     country_id = models.ForeignKey(
         Country, on_delete=models.CASCADE, null=True, default=None, related_name="address_country_id"
     )
-    lat = models.FloatField(null=True, default=None)
-    lng = models.FloatField(null=True, default=None)
+    lat = models.FloatField(null=True, default=0.0)
+    lng = models.FloatField(null=True, default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Address"
+        verbose_name_plural = "Addresses"
 
     def __str__(self) -> str:
         return f"{self.address}"

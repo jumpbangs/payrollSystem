@@ -120,6 +120,10 @@ class EmploymentTerms(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "Employment Term"
+        verbose_name_plural = "Employment Terms"
+
 
 class Payments(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
@@ -130,6 +134,10 @@ class Payments(models.Model):
     last_payment = models.DateField(null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Payment"
+        verbose_name_plural = "Payments"
 
     def __str__(self) -> str:
         return f"{self.employee_id}"

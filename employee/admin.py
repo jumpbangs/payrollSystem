@@ -8,6 +8,7 @@ from .models import Employee, EmploymentTerms, Payments
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ("user_id", "first_name", "last_name", "user_role", "employment_type")
     search_fields = ("user_id", "first_name", "last_name", "user_role", "employment_type")
+    exclude = ("groups", "user_permissions")
 
 
 class EmployeeTermsAdmin(admin.ModelAdmin):

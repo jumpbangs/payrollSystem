@@ -30,6 +30,10 @@ class Clients(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "Client"
+        verbose_name_plural = "Clients"
+
     def __str__(self) -> str:
         return f"{self.id} --> {self.client_name} --> {self.client_email} --> {self.client_address}"
 
@@ -44,6 +48,10 @@ class Jobs(models.Model):
     rate = models.DecimalField(null=True, default=0, decimal_places=2, max_digits=10)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Job"
+        verbose_name_plural = "Jobs"
 
     def __str__(self):
         return str(self.id)
@@ -74,6 +82,10 @@ class Worklogs(models.Model):
         choices=WorklogStatus.choices,
         default=WorklogStatus.PENDING,
     )
+
+    class Meta:
+        verbose_name = "Worklog"
+        verbose_name_plural = "Worklogs"
 
     def __str__(self):
         return str(self.id)
