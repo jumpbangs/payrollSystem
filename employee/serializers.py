@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Employee, EmploymentTerms, Payments
+from .models import Employee, EmployeeBankDetails, EmploymentTerms, Payments
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -84,3 +84,16 @@ class PaymentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payments
         fields = ["gross_salary", "tax", "net_salary", "last_payment", "employee_id"]
+
+
+class EmployeeBankDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeBankDetails
+        fields = [
+            "employee_id",
+            "tax_number",
+            "bank_name",
+            "swift_code",
+            "bank_account_number",
+            "provident_fund_number",
+        ]

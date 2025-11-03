@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.core.management.base import BaseCommand
 
-from employee.models import Employee
+from employee.models import Employee, EmployeeBankDetails
 
 
 def get_current_year():
@@ -50,5 +50,13 @@ class Command(BaseCommand):
         )
         emp.set_password(str(get_current_year()) + emp.last_name)
         emp.save()
+
+        EmployeeBankDetails.objects.create(
+            employee_id=emp,
+            tax_number="0001_0001_00001",
+            bank_account_number="320 3301",
+            provident_fund_number="0001 ADFE 0001",
+            bank_name="TEST BANK",
+        )
 
         self.stdout.write(self.style.SUCCESS("Initial data populated successfully"))

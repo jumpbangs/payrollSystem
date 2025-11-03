@@ -125,6 +125,16 @@ class EmploymentTerms(models.Model):
         verbose_name_plural = "Employment Terms"
 
 
+class EmployeeBankDetails(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
+    employee_id = models.OneToOneField(Employee, on_delete=models.CASCADE)
+    tax_number = models.CharField(null=True, default=None, max_length=20)
+    bank_name = models.CharField(null=True, default=None, max_length=40)
+    swift_code = models.CharField(null=True, default=None, max_length=11)
+    bank_account_number = models.CharField(null=True, default=None, max_length=10)
+    provident_fund_number = models.CharField(null=True, default=None, max_length=20)
+
+
 class Payments(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, default=None)

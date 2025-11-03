@@ -41,7 +41,7 @@ class ClientModelView(APIView, PaginationHandlerMixin):
                 return self.get_paginated_response(serialized_data.data)
 
             except Exception as exception:
-                return get_server_response_500(str(exception))
+                return get_server_response_500(f"Exception when fetching clients' details : {str(exception)}")
 
         else:
             try:
@@ -52,7 +52,7 @@ class ClientModelView(APIView, PaginationHandlerMixin):
             except Clients.DoesNotExist:
                 return get_error_response_400("Client does not exist")
             except Exception as exception:
-                return get_server_response_500(str(exception))
+                return get_server_response_500(f"Exception when fetching client's detail :{str(exception)}")
 
     """
     POST: Add client detail
@@ -85,7 +85,7 @@ class ClientModelView(APIView, PaginationHandlerMixin):
                 return get_error_response_400("Invalid client data")
 
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when adding new client : {str(exception)}")
 
     """
     PATCH: Update Client with given client id
@@ -114,4 +114,4 @@ class ClientModelView(APIView, PaginationHandlerMixin):
             return get_error_response_400("Given client_id does not exist")
 
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when updating client detail: {str(exception)}")

@@ -46,7 +46,7 @@ class CityModelView(APIView):
                 return get_success_response_200(serialized_data.data)
 
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when fetching city :{str(exception)}")
 
     """
     POST: Add a city
@@ -82,7 +82,7 @@ class CityModelView(APIView):
                 return get_error_response_400("City data is invalid")
 
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when adding a new city :{str(exception)}")
 
     """
     PUT: Update a city
@@ -114,7 +114,7 @@ class CityModelView(APIView):
         except City.DoesNotExist:
             return get_error_response_404("City not found or doesn't exist")
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when updating a city detail :{str(exception)}")
 
     """
     DELETE: Delete a city
@@ -138,4 +138,4 @@ class CityModelView(APIView):
         except City.DoesNotExist:
             return get_error_response_404("City not found")
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when deleting a city :{str(exception)}")

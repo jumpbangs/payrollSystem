@@ -42,7 +42,7 @@ class AddressModelView(APIView):
                 return get_success_response_200(serialized_data.data)
 
             except Exception as exception:
-                return get_server_response_500(str(exception))
+                return get_server_response_500(f"Exception when fetching addresses :{str(exception)}")
         else:
             try:
                 address_data = Address.objects.get(pk=address_data)
@@ -52,7 +52,7 @@ class AddressModelView(APIView):
             except Address.DoesNotExist:
                 return get_error_response_404("Address not found or doesn't exist")
             except Exception as exception:
-                return get_server_response_500(str(exception))
+                return get_server_response_500(f"Exception when fetching address :{str(exception)}")
 
     """
     POST: Add Address data
@@ -86,7 +86,7 @@ class AddressModelView(APIView):
             else:
                 return get_error_response_400("Address data is invalid")
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when adding new address  :{str(exception)}")
 
     """
     PUT: Update Address data
@@ -117,7 +117,7 @@ class AddressModelView(APIView):
                 return get_error_response_400("Address data is invalid")
 
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when updating address detail: {str(exception)}")
 
     """
     DELETE: Delete Address data
@@ -141,4 +141,4 @@ class AddressModelView(APIView):
         except Address.DoesNotExist:
             return get_error_response_400("Address not found")
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when deleting address :{str(exception)}")

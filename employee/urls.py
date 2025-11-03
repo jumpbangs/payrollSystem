@@ -2,6 +2,7 @@ from django.urls import path
 
 from employee.views.AuthView import ChangePasswordView, LoginView, LogoutView
 from employee.views.EmployeeViews import (
+    EmployeeBankDetailView,
     EmployeeModelView,
     EmploymentTermsView,
     PaymentView,
@@ -13,5 +14,6 @@ urlpatterns = [
     path("change-password/", ChangePasswordView.as_view()),
     path("employee/", EmployeeModelView.as_view()),
     path("employee/terms/", EmploymentTermsView.as_view()),
+    path("employee/bank-details", EmployeeBankDetailView.as_view()),
     path("payment/details/", PaymentView.as_view()),
 ]

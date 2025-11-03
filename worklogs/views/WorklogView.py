@@ -43,7 +43,7 @@ class WorklogModelView(APIView):
                 serialized_data = WorklogMinSerializer(worklog_obj, many=True)
                 return get_success_response_200(serialized_data.data)
             except Exception as exception:
-                return get_server_response_500(str(exception))
+                return get_server_response_500(f"Exception fetching worklogs :{str(exception)}")
 
         else:
             try:
@@ -57,7 +57,7 @@ class WorklogModelView(APIView):
             except Worklogs.DoesNotExist:
                 return get_error_response_404("Worklog not found")
             except Exception as exception:
-                return get_server_response_500(str(exception))
+                return get_server_response_500(f"Exception fetching worklog :{str(exception)}")
 
     """
     POST: Create new worklog
@@ -89,7 +89,7 @@ class WorklogModelView(APIView):
             else:
                 return get_error_response_400("Invalid worklog data")
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when adding new worklog :{str(exception)}")
 
     """
     PATCH: Update given worklog by worklog_id
@@ -117,12 +117,14 @@ class WorklogModelView(APIView):
             if serialized_worklog.is_valid():
                 return get_success_response_200(serialized_worklog.data)
             else:
-                return get_error_response_400(str(serialized_worklog.errors))
+                return get_error_response_400(
+                    f"Exception when saving updated worklog : {str(serialized_worklog.errors)}"
+                )
 
         except Worklogs.DoesNotExist:
             return get_error_response_404("Invalid worklog id")
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when updating worklog :{str(exception)}")
 
     """
     DELETE: Delete the given worklog by worklog_id
@@ -148,7 +150,7 @@ class WorklogModelView(APIView):
         except Worklogs.DoesNotExist:
             return get_error_response_400("Worklog_id is invalid")
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when deleting a worklog :{str(exception)}")
 
 
 class JobsModelView(APIView, PaginationHandlerMixin):
@@ -157,7 +159,7 @@ class JobsModelView(APIView, PaginationHandlerMixin):
     pagination_class = CustomPagination
 
     """
-    GET: Fetch Worklog by id
+    GET: Fetch Job by id
     """
 
     def get(self, request):
@@ -170,7 +172,7 @@ class JobsModelView(APIView, PaginationHandlerMixin):
                 serialized_data = JobsSerializer(page, many=True)
                 return self.get_paginated_response(serialized_data.data)
             except Exception as exception:
-                return get_server_response_500(str(exception))
+                return get_server_response_500(f"Exception when fetching jobs :{str(exception)}")
         else:
             try:
                 worklog_detail = Jobs.objects.get(pk=worklog_detail_id)
@@ -180,10 +182,10 @@ class JobsModelView(APIView, PaginationHandlerMixin):
             except Jobs.DoesNotExist:
                 return get_error_response_400("Job id does not exist")
             except Exception as exception:
-                return get_server_response_500(str(exception))
+                return get_server_response_500(f"Exception when fetching job :{str(exception)}")
 
     """
-    POST: Add a new worklog detail
+    POST: Add a new Job detail
     """
 
     def post(self, request):
@@ -211,7 +213,7 @@ class JobsModelView(APIView, PaginationHandlerMixin):
                 return get_error_response_400("Failed to add new worklog detail")
 
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when adding a new job :{str(exception)}")
 
     """
     PATCH: Update the worklog detail by ID
@@ -246,7 +248,7 @@ class JobsModelView(APIView, PaginationHandlerMixin):
             return get_error_response_400("Given detail_id for worklog does not exist")
 
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when updating job detail :{str(exception)}")
 
     """
     DELETE: Delete the worklog detail by ID
@@ -271,4 +273,4 @@ class JobsModelView(APIView, PaginationHandlerMixin):
                 return get_error_response_400("Following worklog detail_id does not exists!")
 
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when deleting job :{str(exception)}")

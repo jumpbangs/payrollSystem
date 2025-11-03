@@ -53,7 +53,7 @@ class LoginView(APIView):
                 return get_success_response_200(data)
 
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when logging in :{str(exception)}")
 
 
 class LogoutView(APIView):

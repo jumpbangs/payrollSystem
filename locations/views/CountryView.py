@@ -38,7 +38,7 @@ class CountryModelView(APIView):
             return get_success_response_200(serialized_data.data)
 
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when fetching country :{str(exception)}")
 
     """
     POST: Add new country
@@ -73,7 +73,7 @@ class CountryModelView(APIView):
                 return get_error_response_400("Country data is invalid")
 
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when adding a new country :{str(exception)}")
 
     """
     PUT: Update country
@@ -105,4 +105,4 @@ class CountryModelView(APIView):
         except Country.DoesNotExist:
             return get_error_response_404("Country not found or doesn't exist")
         except Exception as exception:
-            return get_server_response_500(str(exception))
+            return get_server_response_500(f"Exception when updating a country :{str(exception)}")
