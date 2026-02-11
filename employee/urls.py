@@ -6,6 +6,7 @@ from employee.views.EmployeeViews import (
     EmployeeModelView,
     EmploymentTermsView,
     PaymentView,
+    TeamsView,
 )
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path("employee/terms/", EmploymentTermsView.as_view()),
     path("employee/bank-details", EmployeeBankDetailView.as_view()),
     path("payment/details/", PaymentView.as_view()),
+    path("teams/", TeamsView.as_view()),
 ]

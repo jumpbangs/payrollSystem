@@ -1,6 +1,14 @@
+from django.db.models import Q
 from rest_framework import serializers
 
-from .models import Employee, EmployeeBankDetails, EmploymentTerms, Payments
+from .models import (
+    Employee,
+    EmployeeBankDetails,
+    EmploymentTerms,
+    Payments,
+    TeamMembers,
+    Teams,
+)
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -96,4 +104,38 @@ class EmployeeBankDetailSerializer(serializers.ModelSerializer):
             "swift_code",
             "bank_account_number",
             "provident_fund_number",
+        ]
+
+
+class TeamsListSerializer(serializers.ModelSerializer):
+    parent_team = serializers.SerializerMethodField()
+    member_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Teams
+        fields = ["team_id", "team_name", "description", "parent_team", "member_count"]
+
+    def get_parent_team(self, obj):
+        if not obj.parent:
+            return None
+        return obj.parent.team_name
+
+    def get_member_count(self, obj):
+        return TeamMembers.objects.filter(Q(team=obj) | Q(team__parent=obj)).count()
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if data.get("parent_team") is None:
+            data.pop("parent_team")
+        return data
+
+
+class TeamDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Teams
+        fields = [
+            "team_id",
+            "team_name",
+            "description",
+            "parent",
         ]

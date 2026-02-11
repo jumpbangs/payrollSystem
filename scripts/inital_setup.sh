@@ -11,5 +11,6 @@ python manage.py migrate --noinput
 echo "Populating database"
 python manage.py employee_initial_data
 python manage.py location_initial_data
+python manage.py teams_initial_data
 
 echo "Done"

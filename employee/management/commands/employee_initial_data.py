@@ -59,4 +59,29 @@ class Command(BaseCommand):
             bank_name="TEST BANK",
         )
 
+        emp_supervisor = Employee.objects.create(
+            first_name="Jane",
+            last_name="Smith",
+            date_of_birth="1985-05-15",
+            employment_type=1,
+            email="jane@example.com",
+            employment_start="2022-01-01",
+            contact_number="0987654321",
+            user_role="S",
+            is_staff=True,
+            is_active=True,
+            is_superuser=False,
+        )
+
+        emp_supervisor.set_password(str(get_current_year()) + emp_supervisor.last_name)
+        emp_supervisor.save()
+
+        EmployeeBankDetails.objects.create(
+            employee_id=emp_supervisor,
+            tax_number="0001_0001_00002",
+            bank_account_number="320 3302",
+            provident_fund_number="0001 ADFE 0002",
+            bank_name="TEST BANK",
+        )
+
         self.stdout.write(self.style.SUCCESS("Initial data populated successfully"))

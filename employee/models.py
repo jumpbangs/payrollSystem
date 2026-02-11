@@ -6,6 +6,7 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from backend.utils.dateUtils import get_current_year
@@ -88,9 +89,9 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     def save(self, *args, **kwargs):
         if self._state.adding:
-            if self.password is None:
+            if not self.has_usable_password():
                 username = self.email.split("@")[0]
-                self.set_password(str(get_current_year) + str(username))
+                self.set_password(f"{get_current_year()}{username}")
 
             super().save(*args, **kwargs)
             EmploymentTerms.objects.create(
@@ -151,3 +152,47 @@ class Payments(models.Model):
 
     def __str__(self) -> str:
         return f"{self.employee_id}"
+
+
+class Teams(models.Model):
+    team_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    parent = models.ForeignKey("self", null=True, blank=True, related_name="sub_teams", on_delete=models.PROTECT)
+
+    team_name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    members = models.ManyToManyField("Employee", through="TeamMembers", related_name="teams")
+
+    class Meta:
+        verbose_name = "Team"
+        verbose_name_plural = "Teams"
+
+    def clean(self):
+        # Prevent a team from being its own parent
+        if self.parent and self.parent_id == self.team_id:
+            raise ValidationError({"parent": "A team cannot be its own parent."})
+
+        # Prevent 2nd-level nesting
+        if self.parent and self.parent.parent:
+            raise ValidationError({"parent": "Only one level of team nesting is allowed."})
+
+        # Prevent re-parenting a parent team
+        if self.pk and self.parent and self.sub_teams.exists():
+            raise ValidationError("A parent team cannot be nested under another team.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.team_name
+
+
+class TeamMembers(models.Model):
+    member = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    team = models.ForeignKey(Teams, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("member", "team")

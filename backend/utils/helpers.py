@@ -14,6 +14,14 @@ def is_user_manager_or_admin(user_role):
     return user_role == "M" or user_role == "A"
 
 
+def is_upper_management(user_role):
+    return user_role == "M" or user_role == "A" or user_role == "S"
+
+
+def is_user_supervisor(user_role):
+    return user_role == "S"
+
+
 def is_user_admin(user_role):
     return user_role == "A"
 

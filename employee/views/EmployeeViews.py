@@ -14,6 +14,7 @@ from backend.networkHelpers import (
 )
 from backend.utils.helpers import (
     is_none_or_empty,
+    is_upper_management,
     is_user_admin,
     is_user_manager_or_admin,
 )
@@ -33,12 +34,20 @@ from employee.docs.term_schema import (
     get_employee_term_schema,
     patch_employee_term_schema,
 )
-from employee.models import Employee, EmployeeBankDetails, EmploymentTerms, Payments
+from employee.models import (
+    Employee,
+    EmployeeBankDetails,
+    EmploymentTerms,
+    Payments,
+    Teams,
+)
 from employee.serializers import (
     EmployeeBankDetailSerializer,
     EmployeeSerializer,
     EmploymentTermsSerializer,
     PaymentsSerializer,
+    TeamDetailSerializer,
+    TeamsListSerializer,
 )
 
 
@@ -444,3 +453,39 @@ class EmployeeBankDetailView(APIView):
 
         except Exception as exception:
             return get_server_response_500(f"Exception updating employee's bank details: {str(exception)}")
+
+
+class TeamsView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    """
+    GET: Fetches all teams/team members for the given team id
+    """
+
+    def get(self, request):
+        if not is_upper_management(request.user.user_role):
+            return get_error_response_400("Only upper management are allow to fetch teams")
+
+        team_id = request.query_params.get("team_id") or None
+
+        if team_id is not None:
+            try:
+                team_detail = Teams.objects.filter(team_id=team_id).first()
+                if not team_detail:
+                    return get_error_response_400("Following team does not exist")
+
+                TeamDetailSerializer(team_detail)
+                return get_success_response_200("Fetched team details")
+            except Exception as exception:
+                return get_server_response_500(f"Exception when fetching team detail: {str(exception)}")
+
+        else:
+            try:
+                team_list = Teams.objects.all()
+                serialized_team_list = TeamsListSerializer(team_list, many=True)
+
+                return get_success_response_200(serialized_team_list.data)
+
+            except Exception as exception:
+                return get_server_response_500(f"Exception when fetching team : {str(exception)}")
