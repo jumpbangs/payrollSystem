@@ -38,22 +38,33 @@ Endpoints and the REST API that is used in the following project.
 
 ---
 ## Employee
-### Auth Views
+### Auth Views ✅ - Has schema
 - Login (POST)
 - Logout (DELETE)
 - Change Password (POST)
 
-### Employee Views
+### Employee Views ✅ - Has schema
 - GET
 - POST
 - PATCH
 - DELETE
 
-### Employment Terms View
+### Employment Terms View ✅ - Has schema
 - GET
 - PATCH
 
-### Payment View
+### Payment View ✅ - Has schema
+- GET
+- POST
+- PATCH
+- DELETE
+
+### Employee Banking Detail View
+- GET
+- POST
+- PATCH
+
+### Team View
 - GET
 - POST
 - PATCH
@@ -61,32 +72,31 @@ Endpoints and the REST API that is used in the following project.
 
 ---
 ## Locations
-### Address View
+### Address View ✅ - Has schema
 - GET
 - POST
 - PUT
 - DELETE
 
-### City View
+### City View ✅ - Has schema
 - GET
 - POST
 - PUT
 - DELETE
 
-### Country View
+### Country View ✅ - Has schema
 - GET
 - POST
 - PUT
 
 ---
 ## Worklogs
-### Client View
+### Client View ✅ - Has schema
 - GET
 - POST
 - PATCH
-- DELETE
 
-### Worklog View
+### Worklog View ✅ - Has schema
 - GET
 - POST
 - PATCH
