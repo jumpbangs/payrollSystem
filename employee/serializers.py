@@ -131,11 +131,18 @@ class TeamsListSerializer(serializers.ModelSerializer):
 
 
 class TeamDetailSerializer(serializers.ModelSerializer):
+    members_list = serializers.SerializerMethodField()
+
     class Meta:
         model = Teams
         fields = [
             "team_id",
             "team_name",
             "description",
+            "members_list",
             "parent",
         ]
+
+    def get_members_list(self, obj):
+        team_members = TeamMembers.objects.filter(Q(team=obj) | Q(team__parent=obj)).select_related("member")
+        return EmployeeMinSerializer([member.member for member in team_members], many=True).data

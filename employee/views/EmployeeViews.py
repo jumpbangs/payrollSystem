@@ -475,8 +475,8 @@ class TeamsView(APIView):
                 if not team_detail:
                     return get_error_response_400("Following team does not exist")
 
-                TeamDetailSerializer(team_detail)
-                return get_success_response_200("Fetched team details")
+                serialized_team_detail = TeamDetailSerializer(team_detail)
+                return get_success_response_200(serialized_team_detail.data)
             except Exception as exception:
                 return get_server_response_500(f"Exception when fetching team detail: {str(exception)}")
 
@@ -489,3 +489,90 @@ class TeamsView(APIView):
 
             except Exception as exception:
                 return get_server_response_500(f"Exception when fetching team : {str(exception)}")
+
+    """
+    POST: Create a new team
+    """
+
+    def post(self, request):
+        if not is_upper_management(request.user.user_role):
+            return get_error_response_400("Only upper management are allow to create teams")
+
+        team_data = request.data
+        required_fields = ["team_name", "description"]
+
+        missing_fields = [field for field in required_fields if field not in team_data]
+        if missing_fields:
+            return get_error_response_400(f"Missing fields: {', '.join(missing_fields)}")
+
+        if Teams.objects.filter(team_name=team_data.get("team_name")).exists():
+            return get_error_response_400("Team with the same name already exists")
+
+        try:
+            serialized_team_data = TeamDetailSerializer(data=team_data)
+            if serialized_team_data.is_valid():
+                serialized_team_data.save()
+                return get_success_response_201(serialized_team_data.data)
+            else:
+                return get_error_response_400("Failed to create team")
+
+        except Exception as exception:
+            return get_server_response_500(f"Exception when creating team: {str(exception)}")
+
+    """
+    PATCH: Update team details
+    """
+
+    def patch(self, request):
+        if not is_upper_management(request.user.user_role):
+            return get_error_response_400("Only upper management are allow to update teams")
+
+        team_data = request.data
+        team_id = team_data.get("team_id")
+
+        if is_none_or_empty(team_id):
+            return get_error_response_400("Team id cannot be empty")
+
+        try:
+            team_to_update = Teams.objects.get(team_id=team_id)
+            new_member_ids = team_data.get("members", [])
+
+            if new_member_ids:
+                employees = Employee.objects.filter(user_id__in=new_member_ids)
+                team_to_update.members.add(*employees)
+
+            serialized_team_data = TeamDetailSerializer(team_to_update, data=team_data, partial=True)
+
+            if serialized_team_data.is_valid():
+                serialized_team_data.save()
+                return get_success_response_200(serialized_team_data.data)
+            else:
+                return get_error_response_400("Failed to update team")
+
+        except Teams.DoesNotExist:
+            return get_error_response_400("Following team does not exist")
+
+        except Exception as exception:
+            return get_server_response_500(f"Exception when updating team: {str(exception)}")
+
+    """
+    DELETE: Delete a team
+    """
+
+    def delete(self, request):
+        if not is_upper_management(request.user.user_role):
+            return get_error_response_400("Only upper management are allow to delete teams")
+
+        team_id = request.query_params.get("team_id")
+
+        if is_none_or_empty(team_id):
+            return get_error_response_400("Team id cannot be empty")
+
+        try:
+            team_to_delete = Teams.objects.get(team_id=team_id)
+            team_to_delete.delete()
+            return get_success_response_200("Team has been deleted")
+        except Teams.DoesNotExist:
+            return get_error_response_400("Following team does not exist")
+        except Exception as exception:
+            return get_server_response_500(f"Exception when deleting team: {str(exception)}")
