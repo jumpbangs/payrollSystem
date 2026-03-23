@@ -6,8 +6,8 @@ from employee.views.EmployeeViews import (
     EmployeeModelView,
     EmploymentTermsView,
     PaymentView,
-    TeamsView,
 )
+from employee.views.TeamsView import TeamsView
 
 urlpatterns = [
     path("login/", LoginView.as_view()),

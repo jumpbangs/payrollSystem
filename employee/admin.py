@@ -13,8 +13,20 @@ from .models import (
 
 
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ("user_id", "first_name", "last_name", "user_role", "employment_type")
-    search_fields = ("user_id", "first_name", "last_name", "user_role", "employment_type")
+    list_display = (
+        "user_id",
+        "first_name",
+        "last_name",
+        "user_role",
+        "employment_type",
+    )
+    search_fields = (
+        "user_id",
+        "first_name",
+        "last_name",
+        "user_role",
+        "employment_type",
+    )
     exclude = ("groups", "user_permissions")
 
 
@@ -44,7 +56,12 @@ class EmployeeBankDetailsAdmin(admin.ModelAdmin):
 
 class PaymentsAdmin(admin.ModelAdmin):
     list_display = ("id", "get_employee_name", "employee_id")
-    search_fields = ("id", "employee_id__first_name", "employee_id__last_name", "employee_id")
+    search_fields = (
+        "id",
+        "employee_id__first_name",
+        "employee_id__last_name",
+        "employee_id",
+    )
 
     def get_employee_name(self, obj):
         last_name = obj.employee_id.last_name if obj.employee_id.last_name != None else " "
@@ -56,7 +73,12 @@ class PaymentsAdmin(admin.ModelAdmin):
 
 class TeamsAdmin(admin.ModelAdmin):
     list_display = ("team_id", "team_name", "description")
-    search_fields = ("team_id", "team_name", "team_members__first_name", "team_members__last_name")
+    search_fields = (
+        "team_id",
+        "team_name",
+        "team_members__first_name",
+        "team_members__last_name",
+    )
 
 
 class TeamMembersAdmin(admin.ModelAdmin):

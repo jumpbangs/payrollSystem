@@ -58,7 +58,12 @@ class EmployeeManager(BaseUserManager):
 
 
 class Employee(AbstractBaseUser, PermissionsMixin):
-    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
+    user_id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        auto_created=True,
+    )
     first_name = models.CharField(max_length=100, null=True, default=None)
     last_name = models.CharField(max_length=100, null=True, default=None)
     date_of_birth = models.DateField(null=True, default=None)
@@ -69,7 +74,12 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         default=EmploymentType.PART_TIME,
         choices=EmploymentType.choices,
     )
-    employee_address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, default=None)
+    employee_address = models.ForeignKey(
+        Address,
+        on_delete=models.CASCADE,
+        null=True,
+        default=None,
+    )
     email = models.EmailField(max_length=225, unique=True, default=None)
     employment_start = models.DateTimeField(auto_now_add=True)
     contact_number = models.IntegerField(null=True, default=None)
@@ -77,7 +87,12 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     updated_at = models.DateTimeField(auto_now=True)
     password = models.CharField(max_length=100, null=True, default=None)
 
-    user_role = models.CharField(max_length=1, null=False, choices=UserRole.choices, default=UserRole.EMPLOYEE)
+    user_role = models.CharField(
+        max_length=1,
+        null=False,
+        choices=UserRole.choices,
+        default=UserRole.EMPLOYEE,
+    )
     is_staff = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
@@ -111,8 +126,18 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
 
 class EmploymentTerms(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
-    employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, default=None)
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        auto_created=True,
+    )
+    employee_id = models.ForeignKey(
+        Employee,
+        on_delete=models.CASCADE,
+        null=True,
+        default=None,
+    )
     leave_days = models.IntegerField(null=True, default=0)
     sick_days = models.IntegerField(null=True, default=14)
     agreed_salary = models.FloatField(null=True, default=None)
@@ -127,7 +152,12 @@ class EmploymentTerms(models.Model):
 
 
 class EmployeeBankDetails(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        auto_created=True,
+    )
     employee_id = models.OneToOneField(Employee, on_delete=models.CASCADE)
     tax_number = models.CharField(null=True, default=None, max_length=20)
     bank_name = models.CharField(null=True, default=None, max_length=40)
@@ -137,8 +167,18 @@ class EmployeeBankDetails(models.Model):
 
 
 class Payments(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
-    employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, default=None)
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        auto_created=True,
+    )
+    employee_id = models.ForeignKey(
+        Employee,
+        on_delete=models.CASCADE,
+        null=True,
+        default=None,
+    )
     gross_salary = models.FloatField(null=True, default=0)
     net_salary = models.FloatField(null=True, default=0)
     tax = models.DecimalField(null=True, default=0, decimal_places=2, max_digits=10)
@@ -157,13 +197,23 @@ class Payments(models.Model):
 class Teams(models.Model):
     team_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    parent = models.ForeignKey("self", null=True, blank=True, related_name="sub_teams", on_delete=models.PROTECT)
+    parent = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        related_name="sub_teams",
+        on_delete=models.PROTECT,
+    )
 
     team_name = models.CharField(max_length=100, unique=True)
     description = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    members = models.ManyToManyField("Employee", through="TeamMembers", related_name="teams")
+    members = models.ManyToManyField(
+        "Employee",
+        through="TeamMembers",
+        related_name="teams",
+    )
 
     class Meta:
         verbose_name = "Team"
@@ -176,7 +226,9 @@ class Teams(models.Model):
 
         # Prevent 2nd-level nesting
         if self.parent and self.parent.parent:
-            raise ValidationError({"parent": "Only one level of team nesting is allowed."})
+            raise ValidationError(
+                {"parent": "Only one level of team nesting is allowed."},
+            )
 
         # Prevent re-parenting a parent team
         if self.pk and self.parent and self.sub_teams.exists():

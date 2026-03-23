@@ -19,7 +19,7 @@ get_employee_bank_details_schema = extend_schema(
             many=False,
             required=True,
             description="Employee to fetch bank details by user_id",
-        )
+        ),
     ],
     responses={
         200: EmployeeBankDetailSerializer(many=False),
@@ -52,7 +52,7 @@ post_employee_bank_details_schema = extend_schema(
                 "- Employee bank details data cannot be empty\n"
                 "- Employee with this id does not exist\n"
                 "- Employee bank details for this employee already exist"
-            )
+            ),
         ),
     },
     tags=[EMPLOYEE_BANK_TAGS],

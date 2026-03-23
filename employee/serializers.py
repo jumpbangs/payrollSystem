@@ -144,5 +144,10 @@ class TeamDetailSerializer(serializers.ModelSerializer):
         ]
 
     def get_members_list(self, obj):
-        team_members = TeamMembers.objects.filter(Q(team=obj) | Q(team__parent=obj)).select_related("member")
-        return EmployeeMinSerializer([member.member for member in team_members], many=True).data
+        team_members = TeamMembers.objects.filter(
+            Q(team=obj) | Q(team__parent=obj),
+        ).select_related("member")
+        return EmployeeMinSerializer(
+            [member.member for member in team_members],
+            many=True,
+        ).data

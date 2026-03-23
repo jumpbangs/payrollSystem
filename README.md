@@ -107,3 +107,15 @@ Endpoints and the REST API that is used in the following project.
 - POST
 - PATCH
 - DELETE
+
+---
+
+### Python pyproject config
+
+"F" - Pyflakes rules
+"T" - flake8 TODO comments rules
+"UP" - Warn if certain things can changed due to newer Python versions
+"I" - Sort imports properly,
+"ICN" - flake8 import conventions
+"COM" - enforce trailing comma rules
+"FBT" - detect boolean traps

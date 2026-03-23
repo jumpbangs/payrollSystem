@@ -19,7 +19,7 @@ get_payment_schema = extend_schema(
             many=False,
             required=True,
             description="Fetch employee payment by employee_id",
-        )
+        ),
     ],
     responses={
         200: PaymentsSerializer,
@@ -29,7 +29,7 @@ get_payment_schema = extend_schema(
                 "- Employee payment doesn't exist for the given employee\n"
                 "- Employee id is empty.\n"
                 "- Only admins and users can fetch other/their user payment details"
-            )
+            ),
         ),
         500: OpenApiResponse(description="Server error"),
     },
@@ -50,7 +50,7 @@ post_payment_schema = extend_schema(
     responses={
         200: PaymentsSerializer,
         400: OpenApiResponse(
-            description="Possible errors:\n- Missing fields\n- Employee payment details exists\n- Serializer error"
+            description="Possible errors:\n- Missing fields\n- Employee payment details exists\n- Serializer error",
         ),
         401: OpenApiResponse(description="Only admin and managers can add user payment detail"),
         500: OpenApiResponse(description="Server error"),
@@ -90,7 +90,7 @@ delete_payment_schema = extend_schema(
             many=False,
             required=False,
             description="Employee to delete by given employee_id.",
-        )
+        ),
     ],
     responses={
         200: OpenApiResponse(description="Employee's payment detail has been deleted"),

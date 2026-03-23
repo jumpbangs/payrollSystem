@@ -23,7 +23,9 @@ class TeamsView(APIView):
 
     def get(self, request):
         if not is_upper_management(request.user.user_role):
-            return get_error_response_400("Only upper management are allow to fetch teams")
+            return get_error_response_400(
+                "Only upper management are allow to fetch teams",
+            )
 
         team_id = request.query_params.get("team_id") or None
 
@@ -36,7 +38,9 @@ class TeamsView(APIView):
                 serialized_team_detail = TeamDetailSerializer(team_detail)
                 return get_success_response_200(serialized_team_detail.data)
             except Exception as exception:
-                return get_server_response_500(f"Exception when fetching team detail: {str(exception)}")
+                return get_server_response_500(
+                    f"Exception when fetching team detail: {str(exception)}",
+                )
 
         else:
             try:
@@ -46,7 +50,9 @@ class TeamsView(APIView):
                 return get_success_response_200(serialized_team_list.data)
 
             except Exception as exception:
-                return get_server_response_500(f"Exception when fetching team : {str(exception)}")
+                return get_server_response_500(
+                    f"Exception when fetching team : {str(exception)}",
+                )
 
     """
     POST: Create a new team
@@ -54,14 +60,18 @@ class TeamsView(APIView):
 
     def post(self, request):
         if not is_upper_management(request.user.user_role):
-            return get_error_response_400("Only upper management are allow to create teams")
+            return get_error_response_400(
+                "Only upper management are allow to create teams",
+            )
 
         team_data = request.data
         required_fields = ["team_name", "description"]
 
         missing_fields = [field for field in required_fields if field not in team_data]
         if missing_fields:
-            return get_error_response_400(f"Missing fields: {', '.join(missing_fields)}")
+            return get_error_response_400(
+                f"Missing fields: {', '.join(missing_fields)}",
+            )
 
         if Teams.objects.filter(team_name=team_data.get("team_name")).exists():
             return get_error_response_400("Team with the same name already exists")
@@ -75,7 +85,9 @@ class TeamsView(APIView):
                 return get_error_response_400("Failed to create team")
 
         except Exception as exception:
-            return get_server_response_500(f"Exception when creating team: {str(exception)}")
+            return get_server_response_500(
+                f"Exception when creating team: {str(exception)}",
+            )
 
     """
     PATCH: Update team details
@@ -83,7 +95,9 @@ class TeamsView(APIView):
 
     def patch(self, request):
         if not is_upper_management(request.user.user_role):
-            return get_error_response_400("Only upper management are allow to update teams")
+            return get_error_response_400(
+                "Only upper management are allow to update teams",
+            )
 
         team_data = request.data
         team_id = team_data.get("team_id")
@@ -99,7 +113,11 @@ class TeamsView(APIView):
                 employees = Employee.objects.filter(user_id__in=new_member_ids)
                 team_to_update.members.add(*employees)
 
-            serialized_team_data = TeamDetailSerializer(team_to_update, data=team_data, partial=True)
+            serialized_team_data = TeamDetailSerializer(
+                team_to_update,
+                data=team_data,
+                partial=True,
+            )
 
             if serialized_team_data.is_valid():
                 serialized_team_data.save()
@@ -111,7 +129,9 @@ class TeamsView(APIView):
             return get_error_response_400("Following team does not exist")
 
         except Exception as exception:
-            return get_server_response_500(f"Exception when updating team: {str(exception)}")
+            return get_server_response_500(
+                f"Exception when updating team: {str(exception)}",
+            )
 
     """
     DELETE: Delete a team
@@ -119,7 +139,9 @@ class TeamsView(APIView):
 
     def delete(self, request):
         if not is_upper_management(request.user.user_role):
-            return get_error_response_400("Only upper management are allow to delete teams")
+            return get_error_response_400(
+                "Only upper management are allow to delete teams",
+            )
 
         team_id = request.query_params.get("team_id")
 
@@ -133,4 +155,6 @@ class TeamsView(APIView):
         except Teams.DoesNotExist:
             return get_error_response_400("Following team does not exist")
         except Exception as exception:
-            return get_server_response_500(f"Exception when deleting team: {str(exception)}")
+            return get_server_response_500(
+                f"Exception when deleting team: {str(exception)}",
+            )
