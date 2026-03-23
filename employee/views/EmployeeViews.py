@@ -18,6 +18,11 @@ from backend.utils.helpers import (
     is_user_admin,
     is_user_manager_or_admin,
 )
+from employee.docs.employee_bank_schema import (
+    get_employee_bank_details_schema,
+    patch_employee_bank_details_schema,
+    post_employee_bank_details_schema,
+)
 from employee.docs.employee_schema import (
     delete_employee_schema,
     get_employee_schema,
@@ -362,6 +367,7 @@ class EmployeeBankDetailView(APIView):
     GET: Fetches employee bank details
     """
 
+    @get_employee_bank_details_schema
     def get(self, request):
         user_id = request.data.get("user_id")
         is_allowed_to_fetch = False
@@ -390,6 +396,7 @@ class EmployeeBankDetailView(APIView):
     POST: Added a new employee bank detail
     """
 
+    @post_employee_bank_details_schema
     def post(self, request):
         employee_id = request.data.get("employee_id")
         bank_details = request.data
@@ -425,6 +432,7 @@ class EmployeeBankDetailView(APIView):
     UPDATE: Update the employee bank details
     """
 
+    @patch_employee_bank_details_schema
     def patch(self, request):
         employee_id = request.data.get("employee_id")
 
@@ -432,13 +440,13 @@ class EmployeeBankDetailView(APIView):
         bank_details.pop("employee_id", None)
 
         if not bank_details:
-            return get_error_response_400("Update bank details not be empty")
+            return get_error_response_400("Update bank details cannot not be empty")
 
         if is_none_or_empty(employee_id):
             return get_error_response_400("Employee id cannot be empty")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only managers and admins are allowed to add new employee bank details")
+            return get_error_response_400("Only managers and admins are allowed to update employee bank details")
 
         try:
             check_employee_bank_details = EmployeeBankDetails.objects.get(employee_id=employee_id)
@@ -447,9 +455,6 @@ class EmployeeBankDetailView(APIView):
             if serialized_data.is_valid():
                 serialized_data.save()
                 return get_success_response_200(serialized_data.data)
-
-        except EmployeeBankDetails.DoesNotExist():
-            return get_error_response_400("The following employee doesn't have any bank detail")
 
         except Exception as exception:
             return get_server_response_500(f"Exception updating employee's bank details: {str(exception)}")

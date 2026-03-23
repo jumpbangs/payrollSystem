@@ -145,6 +145,7 @@ SPECTACULAR_SETTINGS = {
         {"name": "Address", "description": "Address endpoints"},
         {"name": "Employee", "description": "Employee endpoints"},
         {"name": "Employee Payment", "description": "Employee payment endpoints"},
+        {"name": "Employee Bank Details", "description": "Employee banking endpoints"},
     ],
 }
 
