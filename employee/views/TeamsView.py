@@ -9,6 +9,12 @@ from backend.networkHelpers import (
     get_success_response_201,
 )
 from backend.utils.helpers import is_none_or_empty, is_upper_management
+from employee.docs.teams_schema import (
+    delete_teams_schema,
+    get_teams_schema,
+    patch_teams_schema,
+    post_teams_schema,
+)
 from employee.models import Employee, Teams
 from employee.serializers import TeamDetailSerializer, TeamsListSerializer
 
@@ -21,6 +27,7 @@ class TeamsView(APIView):
     GET: Fetches all teams/team members for the given team id
     """
 
+    @get_teams_schema
     def get(self, request):
         if not is_upper_management(request.user.user_role):
             return get_error_response_400(
@@ -58,6 +65,7 @@ class TeamsView(APIView):
     POST: Create a new team
     """
 
+    @post_teams_schema
     def post(self, request):
         if not is_upper_management(request.user.user_role):
             return get_error_response_400(
@@ -93,6 +101,7 @@ class TeamsView(APIView):
     PATCH: Update team details
     """
 
+    @patch_teams_schema
     def patch(self, request):
         if not is_upper_management(request.user.user_role):
             return get_error_response_400(
@@ -137,6 +146,7 @@ class TeamsView(APIView):
     DELETE: Delete a team
     """
 
+    @delete_teams_schema
     def delete(self, request):
         if not is_upper_management(request.user.user_role):
             return get_error_response_400(
