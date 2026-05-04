@@ -2,12 +2,16 @@
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["F", "T"]
+select = ["F", "TD", "UP", "I", "ICN", "COM", "FBT"]
 fixable = ["ALL"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
 
 [tool.ruff.format]
 skip-magic-trailing-comma = false
-line-ending = "auto"
+line-ending = "lf"
+quote-style = "double"
 
 [tool.black]
 line-length = 120
@@ -16,8 +20,8 @@ preview = true
 include = '\.pyi?$'
 exclude = '''
 /(
-      .eggs         # exclude a few common directories in the
-    | .git          # root of the project
+      .eggs
+    | .git
     | .hg
     | .mypy_cache
     | .tox
@@ -27,7 +31,7 @@ exclude = '''
     | build
     | dist
     | migrations
-    | backendev
-    | __pycache
+    | backend_env    # Fixed typo here
+    | __pycache__
   )/
 '''

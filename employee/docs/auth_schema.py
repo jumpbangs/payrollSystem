@@ -19,7 +19,7 @@ login_schema = extend_schema(
                 "- Email and password cannot be empty\n"
                 "- The email is not registered\n"
                 "- The password is incorrect"
-            )
+            ),
         ),
     },
     description="Login endpoint",
@@ -45,7 +45,9 @@ change_password_schema = extend_schema(
     request=ChangePasswordSerializer,
     responses={
         200: OpenApiResponse(description="Password updated successfully"),
-        400: OpenApiResponse(description="Old password and new password cannot be empty"),
+        400: OpenApiResponse(
+            description="Old password and new password cannot be empty",
+        ),
         401: OpenApiResponse(description="The old password is incorrect"),
     },
     description="Change password",

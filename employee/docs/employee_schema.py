@@ -24,7 +24,7 @@ get_employee_schema = extend_schema(
             many=False,
             required=False,
             description="Fetch employee by ID else fetch all if there is none.",
-        )
+        ),
     ],
     responses={
         200: EmployeeSerializer(many=True),
@@ -47,7 +47,7 @@ post_employee_schema = extend_schema(
                 "- Employee data cannot be empty\n"
                 "- Employee email cannot be empty\n"
                 "- Employee with this email already exists"
-            )
+            ),
         ),
         403: OpenApiResponse(description="Only admin and manager can fetch all employees"),
         500: OpenApiResponse(description="Server error"),
@@ -72,12 +72,12 @@ patch_employee_schema = extend_schema(
                 "- Employee data cannot be empty\n"
                 "- Employee id cannot be empty\n"
                 "- Employee data is invalid"
-            )
+            ),
         ),
         401: OpenApiResponse(
             description=(
                 "Possible errors:\n- Only admin can update employee role\n- You are can only update your own profile\n"
-            )
+            ),
         ),
         500: OpenApiResponse(description="Server error"),
     },
@@ -95,7 +95,7 @@ delete_employee_schema = extend_schema(
             many=False,
             required=True,
             description="Employee to delete by user_id",
-        )
+        ),
     ],
     responses={
         200: OpenApiResponse(description="Employee deleted successfully"),

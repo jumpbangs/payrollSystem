@@ -53,7 +53,9 @@ class LoginView(APIView):
                 return get_success_response_200(data)
 
         except Exception as exception:
-            return get_server_response_500(f"Exception when logging in :{str(exception)}")
+            return get_server_response_500(
+                f"Exception when logging in :{str(exception)}",
+            )
 
 
 class LogoutView(APIView):
@@ -89,7 +91,9 @@ class ChangePasswordView(APIView):
             new_password = request.data.get("new_password")
 
             if is_none_or_empty(old_password) or is_none_or_empty(new_password):
-                return get_error_response_400("Old password and new password cannot be empty")
+                return get_error_response_400(
+                    "Old password and new password cannot be empty",
+                )
 
             if not check_password(old_password, request.user.password):
                 return get_error_response_401("The old password is incorrect")

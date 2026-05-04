@@ -22,7 +22,7 @@ patch_employee_term_schema = extend_schema(
                 "- Employment term data cannot be empty\n"
                 "- Employee id cannot be empty\n"
                 "- Employment term data is invalid"
-            )
+            ),
         ),
         401: OpenApiResponse(description="Only admin and manager can update employment terms"),
         500: OpenApiResponse(description="Server error"),

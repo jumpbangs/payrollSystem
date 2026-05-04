@@ -17,6 +17,11 @@ from backend.utils.helpers import (
     is_user_admin,
     is_user_manager_or_admin,
 )
+from employee.docs.employee_bank_schema import (
+    get_employee_bank_details_schema,
+    patch_employee_bank_details_schema,
+    post_employee_bank_details_schema,
+)
 from employee.docs.employee_schema import (
     delete_employee_schema,
     get_employee_schema,
@@ -56,15 +61,21 @@ class EmployeeModelView(APIView):
         employee_id = request.query_params.get("user_id")
         if is_none_or_empty(employee_id):
             if not is_user_manager_or_admin(request.user.user_role):
-                return get_error_response_403("Only admin and manager can fetch all employees")
+                return get_error_response_403(
+                    "Only admin and manager can fetch all employees",
+                )
 
             try:
-                employee_data = Employee.objects.all().exclude(user_id=request.user.user_id)
+                employee_data = Employee.objects.all().exclude(
+                    user_id=request.user.user_id,
+                )
                 serialized_data = EmployeeSerializer(employee_data, many=True)
                 return get_success_response_200(serialized_data.data)
 
             except Exception as exception:
-                return get_server_response_500(f"Exception fetching employees' details: {str(exception)}")
+                return get_server_response_500(
+                    f"Exception fetching employees' details: {str(exception)}",
+                )
         else:
             try:
                 employee_data = Employee.objects.filter(user_id=employee_id)
@@ -74,7 +85,9 @@ class EmployeeModelView(APIView):
             except Employee.DoesNotExist:
                 return get_error_response_404("Employee not found")
             except Exception as exception:
-                return get_server_response_500(f"Exception fetching employee's detail :{str(exception)}")
+                return get_server_response_500(
+                    f"Exception fetching employee's detail :{str(exception)}",
+                )
 
     """
     POST: Add new Employee
@@ -85,7 +98,9 @@ class EmployeeModelView(APIView):
         employee_data = request.data
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_403("Only admin and manager can add new employees")
+            return get_error_response_403(
+                "Only admin and manager can add new employees",
+            )
 
         if is_none_or_empty(employee_data):
             return get_error_response_400("Employee data cannot be empty")
@@ -104,7 +119,9 @@ class EmployeeModelView(APIView):
                 return get_success_response_201(new_employee_data.data)
 
             except Exception as exception:
-                return get_server_response_500(f"Exception when adding a new employee : {str(exception)}")
+                return get_server_response_500(
+                    f"Exception when adding a new employee : {str(exception)}",
+                )
 
     """
     PATCH: Update Employee
@@ -131,9 +148,15 @@ class EmployeeModelView(APIView):
         try:
             employee_data_to_update: Employee = Employee.objects.get(pk=user_id)
             if employee_data_to_update.user_id != request.user.user_id and not is_allowed_to_update:
-                return get_error_response_401("You are can only update your own profile")
+                return get_error_response_401(
+                    "You are can only update your own profile",
+                )
 
-            serialized_data = EmployeeSerializer(employee_data_to_update, data=employee_data, partial=True)
+            serialized_data = EmployeeSerializer(
+                employee_data_to_update,
+                data=employee_data,
+                partial=True,
+            )
             if serialized_data.is_valid():
                 serialized_data.save()
                 return get_success_response_200(serialized_data.data)
@@ -141,7 +164,9 @@ class EmployeeModelView(APIView):
                 return get_error_response_400("Employee data is invalid")
 
         except Exception as exception:
-            return get_server_response_500(f"Exception when updating employee's detail : {str(exception)}")
+            return get_server_response_500(
+                f"Exception when updating employee's detail : {str(exception)}",
+            )
 
     """
     DELETE: Delete Employee
@@ -164,7 +189,9 @@ class EmployeeModelView(APIView):
         except Employee.DoesNotExist:
             return get_error_response_404("Employee not found")
         except Exception as exception:
-            return get_server_response_500(f"Exception when deleting an employee : {str(exception)}")
+            return get_server_response_500(
+                f"Exception when deleting an employee : {str(exception)}",
+            )
 
 
 class EmploymentTermsView(APIView):
@@ -179,22 +206,36 @@ class EmploymentTermsView(APIView):
     def get(self, request):
         employee_id = request.query_params.get("employee_id")
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_401("Only admin and manager can fetch all employment terms")
+            return get_error_response_401(
+                "Only admin and manager can fetch all employment terms",
+            )
 
         if is_none_or_empty(employee_id):
             try:
                 employment_terms_data = EmploymentTerms.objects.all()
-                serialized_data = EmploymentTermsSerializer(employment_terms_data, many=True)
+                serialized_data = EmploymentTermsSerializer(
+                    employment_terms_data,
+                    many=True,
+                )
                 return get_success_response_200(serialized_data.data)
             except Exception as exception:
-                return get_server_response_500(f"Exception on fetching employees employment term : {str(exception)}")
+                return get_server_response_500(
+                    f"Exception on fetching employees employment term : {str(exception)}",
+                )
         else:
             try:
-                employee_term_data = EmploymentTerms.objects.filter(employee_id=employee_id)
-                serialized_data = EmploymentTermsSerializer(employee_term_data, many=False)
+                employee_term_data = EmploymentTerms.objects.filter(
+                    employee_id=employee_id,
+                )
+                serialized_data = EmploymentTermsSerializer(
+                    employee_term_data,
+                    many=False,
+                )
                 return get_success_response_200(serialized_data.data)
             except Exception as exception:
-                return get_server_response_500(f"Exception on fetching employee's employment term : {str(exception)}")
+                return get_server_response_500(
+                    f"Exception on fetching employee's employment term : {str(exception)}",
+                )
 
     """
     PATCH: Update employment term
@@ -206,7 +247,9 @@ class EmploymentTermsView(APIView):
         employee_id = employment_term_data.get("employee_id")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_401("Only admin and manager can update employment terms")
+            return get_error_response_401(
+                "Only admin and manager can update employment terms",
+            )
 
         if is_none_or_empty(employment_term_data):
             return get_error_response_400("Employment term data cannot be empty")
@@ -215,9 +258,13 @@ class EmploymentTermsView(APIView):
             return get_error_response_400("Employee id cannot be empty")
 
         try:
-            employment_term_data_to_update = EmploymentTerms.objects.get(employee_id=employee_id)
+            employment_term_data_to_update = EmploymentTerms.objects.get(
+                employee_id=employee_id,
+            )
             serialized_data = EmploymentTermsSerializer(
-                employment_term_data_to_update, data=employment_term_data, partial=True
+                employment_term_data_to_update,
+                data=employment_term_data,
+                partial=True,
             )
             if serialized_data.is_valid():
                 serialized_data.save()
@@ -226,7 +273,9 @@ class EmploymentTermsView(APIView):
                 return get_error_response_400("Employment term data is invalid")
 
         except Exception as exception:
-            return get_server_response_500(f"Exception when updating employee's employee detail: {str(exception)}")
+            return get_server_response_500(
+                f"Exception when updating employee's employee detail: {str(exception)}",
+            )
 
 
 class PaymentView(APIView):
@@ -243,15 +292,21 @@ class PaymentView(APIView):
 
         def get_employee_payment(given_employee_id):
             try:
-                employee_payment = Payments.objects.filter(employee_id_id=given_employee_id)
+                employee_payment = Payments.objects.filter(
+                    employee_id_id=given_employee_id,
+                )
                 if not employee_payment.exists():
-                    return get_error_response_400("Payment details doesn't exist for the given employee")
+                    return get_error_response_400(
+                        "Payment details doesn't exist for the given employee",
+                    )
                 else:
                     serialized_payment = PaymentsSerializer(employee_payment, many=True)
                     return get_success_response_200(serialized_payment.data)
 
             except Exception as exception:
-                return get_server_response_500(f"Exception fetching employee's payment: {str(exception)}")
+                return get_server_response_500(
+                    f"Exception fetching employee's payment: {str(exception)}",
+                )
 
         if is_user_admin(request.user.user_role):
             if is_none_or_empty(req_employee_id):
@@ -259,7 +314,7 @@ class PaymentView(APIView):
             return get_employee_payment(req_employee_id)
         else:
             return get_employee_payment(request.user.user_id) or get_error_response_400(
-                "Only admins and users can fetch other/their user payment details"
+                "Only admins and users can fetch other/their user payment details",
             )
 
     """
@@ -272,12 +327,16 @@ class PaymentView(APIView):
         required_fields = ["employee_id", "gross_salary", "net_salary", "tax"]
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_401("Only admin and managers can add user payment detail")
+            return get_error_response_401(
+                "Only admin and managers can add user payment detail",
+            )
 
         # Check for required fields
         missing_fields = [field for field in required_fields if field not in payment_detail]
         if missing_fields:
-            return get_error_response_400(f"Missing fields: {', '.join(missing_fields)}")
+            return get_error_response_400(
+                f"Missing fields: {', '.join(missing_fields)}",
+            )
 
         employee_id = payment_detail.get("employee_id")
         try:
@@ -292,7 +351,9 @@ class PaymentView(APIView):
             else:
                 return get_error_response_400(serialized_payment.errors)
         except Exception as exception:
-            return get_server_response_500(f"Exception adding employee's payment details: {str(exception)}")
+            return get_server_response_500(
+                f"Exception adding employee's payment details: {str(exception)}",
+            )
 
     """
     PATCH: Update the user payment detail by the employee_id
@@ -303,7 +364,9 @@ class PaymentView(APIView):
         update_details = request.data
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_401("Only admin and managers can add user payment detail")
+            return get_error_response_401(
+                "Only admin and managers can add user payment detail",
+            )
 
         if "employee_id" not in update_details:
             return get_error_response_400("Employee id is required")
@@ -311,14 +374,20 @@ class PaymentView(APIView):
         try:
             req_employee_id = update_details.get("employee_id")
             employee_to_be_updated = Payments.objects.get(employee_id=req_employee_id)
-            serialized_data = PaymentsSerializer(employee_to_be_updated, data=update_details, partial=True)
+            serialized_data = PaymentsSerializer(
+                employee_to_be_updated,
+                data=update_details,
+                partial=True,
+            )
 
             if serialized_data.is_valid():
                 serialized_data.save()
                 return get_success_response_200(serialized_data.data)
 
         except Exception as exception:
-            return get_server_response_500(f"Exception fetching updating employee's payment detail: {str(exception)}")
+            return get_server_response_500(
+                f"Exception fetching updating employee's payment detail: {str(exception)}",
+            )
 
     """
     DELETE : Delete the user payment detail by employee_id
@@ -329,7 +398,9 @@ class PaymentView(APIView):
         req_employee_id = request.query_params.get("employee_id")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_401("Only admin and managers can delete user payment details")
+            return get_error_response_401(
+                "Only admin and managers can delete user payment details",
+            )
 
         if req_employee_id is None:
             return get_error_response_400("employee_id is required")
@@ -337,12 +408,18 @@ class PaymentView(APIView):
         try:
             employee_payment_detail = Payments.objects.get(employee_id=req_employee_id)
             employee_payment_detail.delete()
-            return get_success_response_200("Employee's payment detail has been deleted")
+            return get_success_response_200(
+                "Employee's payment detail has been deleted",
+            )
 
         except Payments.DoesNotExist:
-            return get_error_response_404("Given employee's payment detail does not exist")
+            return get_error_response_404(
+                "Given employee's payment detail does not exist",
+            )
         except Exception as exception:
-            return get_server_response_500(f"Exception deleting employee's payment detail: {str(exception)}")
+            return get_server_response_500(
+                f"Exception deleting employee's payment detail: {str(exception)}",
+            )
 
 
 class EmployeeBankDetailView(APIView):
@@ -353,6 +430,7 @@ class EmployeeBankDetailView(APIView):
     GET: Fetches employee bank details
     """
 
+    @get_employee_bank_details_schema
     def get(self, request):
         user_id = request.data.get("user_id")
         is_allowed_to_fetch = False
@@ -360,20 +438,28 @@ class EmployeeBankDetailView(APIView):
         if is_none_or_empty(user_id):
             return get_error_response_400("user_id cannot be empty")
 
-        if request.user.user_id == user_id or is_user_manager_or_admin(request.user.user_role):
+        if request.user.user_id == user_id or is_user_manager_or_admin(
+            request.user.user_role,
+        ):
             is_allowed_to_fetch = True
 
         if is_allowed_to_fetch:
             try:
-                bank_details = EmployeeBankDetails.objects.filter(employee_id=user_id).first()
+                bank_details = EmployeeBankDetails.objects.filter(
+                    employee_id=user_id,
+                ).first()
 
                 if not bank_details:
-                    return get_error_response_400("Following employee does not have any bank details")
+                    return get_error_response_400(
+                        "Following employee does not have any bank details",
+                    )
 
                 bank_detail_data = EmployeeBankDetailSerializer(bank_details)
                 return get_success_response_200(bank_detail_data.data)
             except Exception as exception:
-                return get_server_response_500(f"Exception fetching employee's bank details: {str(exception)}")
+                return get_server_response_500(
+                    f"Exception fetching employee's bank details: {str(exception)}",
+                )
 
         return get_error_response_401("Not Authorized")
 
@@ -381,23 +467,35 @@ class EmployeeBankDetailView(APIView):
     POST: Added a new employee bank detail
     """
 
+    @post_employee_bank_details_schema
     def post(self, request):
         employee_id = request.data.get("employee_id")
         bank_details = request.data
-        required_fields = ["employee_id", "tax_number", "bank_name", "bank_account_number"]
+        required_fields = [
+            "employee_id",
+            "tax_number",
+            "bank_name",
+            "bank_account_number",
+        ]
 
         if is_none_or_empty(employee_id):
             return get_error_response_400("Employee id cannot be empty")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only managers and admins are allowed to add new employee bank details")
+            return get_error_response_400(
+                "Only managers and admins are allowed to add new employee bank details",
+            )
 
         missing_fields = [field for field in required_fields if field not in bank_details]
         if missing_fields:
-            return get_error_response_400(f"Missing fields: {', '.join(missing_fields)}")
+            return get_error_response_400(
+                f"Missing fields: {', '.join(missing_fields)}",
+            )
 
         try:
-            check_employee_bank_details = EmployeeBankDetails.objects.filter(employee_id=employee_id)
+            check_employee_bank_details = EmployeeBankDetails.objects.filter(
+                employee_id=employee_id,
+            )
 
             if check_employee_bank_details.exists():
                 return get_error_response_400("Employee's bank details already exists")
@@ -410,12 +508,15 @@ class EmployeeBankDetailView(APIView):
                 return get_error_response_400("Failed to add employee bank details")
 
         except Exception as exception:
-            return get_server_response_500(f"Exception adding employee's bank detail: {str(exception)}")
+            return get_server_response_500(
+                f"Exception adding employee's bank detail: {str(exception)}",
+            )
 
     """
     UPDATE: Update the employee bank details
     """
 
+    @patch_employee_bank_details_schema
     def patch(self, request):
         employee_id = request.data.get("employee_id")
 
@@ -423,24 +524,31 @@ class EmployeeBankDetailView(APIView):
         bank_details.pop("employee_id", None)
 
         if not bank_details:
-            return get_error_response_400("Update bank details not be empty")
+            return get_error_response_400("Update bank details cannot not be empty")
 
         if is_none_or_empty(employee_id):
             return get_error_response_400("Employee id cannot be empty")
 
         if not is_user_manager_or_admin(request.user.user_role):
-            return get_error_response_400("Only managers and admins are allowed to add new employee bank details")
+            return get_error_response_400(
+                "Only managers and admins are allowed to update employee bank details",
+            )
 
         try:
-            check_employee_bank_details = EmployeeBankDetails.objects.get(employee_id=employee_id)
+            check_employee_bank_details = EmployeeBankDetails.objects.get(
+                employee_id=employee_id,
+            )
 
-            serialized_data = EmployeeBankDetailSerializer(check_employee_bank_details, data=bank_details, partial=True)
+            serialized_data = EmployeeBankDetailSerializer(
+                check_employee_bank_details,
+                data=bank_details,
+                partial=True,
+            )
             if serialized_data.is_valid():
                 serialized_data.save()
                 return get_success_response_200(serialized_data.data)
 
-        except EmployeeBankDetails.DoesNotExist():
-            return get_error_response_400("The following employee doesn't have any bank detail")
-
         except Exception as exception:
-            return get_server_response_500(f"Exception updating employee's bank details: {str(exception)}")
+            return get_server_response_500(
+                f"Exception updating employee's bank details: {str(exception)}",
+            )
